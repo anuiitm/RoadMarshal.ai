@@ -2132,8 +2132,10 @@ function Navbar() {
                     href: "/",
                     className: "flex items-center gap-3",
                     children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "h-8 w-8 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-md"
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                            src: "/logo.png",
+                            alt: "RoadMarshal AI Logo",
+                            className: "h-10 w-10"
                         }, void 0, false, {
                             fileName: "[project]/frontend/src/app/components/Navbar.tsx",
                             lineNumber: 13,
@@ -2511,12 +2513,21 @@ function QueryPage() {
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("header", {
                         className: "text-center mb-10",
                         children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                src: "/logo.png",
+                                alt: "RoadMarshal AI Logo",
+                                className: "h-20 w-20 block mx-auto"
+                            }, void 0, false, {
+                                fileName: "[project]/frontend/src/app/page.tsx",
+                                lineNumber: 198,
+                                columnNumber: 11
+                            }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
                                 className: "text-3xl font-bold",
                                 children: "Hi There !! I am RoadMarshal.AI"
                             }, void 0, false, {
                                 fileName: "[project]/frontend/src/app/page.tsx",
-                                lineNumber: 198,
+                                lineNumber: 199,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -2524,7 +2535,7 @@ function QueryPage() {
                                 children: "I am here to assist you with road safety interventions. Please Select your Query"
                             }, void 0, false, {
                                 fileName: "[project]/frontend/src/app/page.tsx",
-                                lineNumber: 199,
+                                lineNumber: 200,
                                 columnNumber: 11
                             }, this)
                         ]
@@ -2541,12 +2552,12 @@ function QueryPage() {
                                 onClick: ()=>toggleCategory(cat)
                             }, cat, false, {
                                 fileName: "[project]/frontend/src/app/page.tsx",
-                                lineNumber: 208,
+                                lineNumber: 209,
                                 columnNumber: 13
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/frontend/src/app/page.tsx",
-                        lineNumber: 206,
+                        lineNumber: 207,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2559,7 +2570,7 @@ function QueryPage() {
                                     onChange: (next)=>handleCategoryChange(cat, next)
                                 }, cat, false, {
                                     fileName: "[project]/frontend/src/app/page.tsx",
-                                    lineNumber: 223,
+                                    lineNumber: 224,
                                     columnNumber: 15
                                 }, this)),
                             selectedCategories.includes("Custom Query") && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2570,23 +2581,23 @@ function QueryPage() {
                                         onParsed: handleCustomQueryParsed
                                     }, void 0, false, {
                                         fileName: "[project]/frontend/src/app/page.tsx",
-                                        lineNumber: 235,
+                                        lineNumber: 236,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/frontend/src/app/page.tsx",
-                                    lineNumber: 234,
+                                    lineNumber: 235,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/frontend/src/app/page.tsx",
-                                lineNumber: 233,
+                                lineNumber: 234,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/frontend/src/app/page.tsx",
-                        lineNumber: 218,
+                        lineNumber: 219,
                         columnNumber: 9
                     }, this),
                     canSubmit && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2600,7 +2611,7 @@ function QueryPage() {
                                         children: "Preview your query:"
                                     }, void 0, false, {
                                         fileName: "[project]/frontend/src/app/page.tsx",
-                                        lineNumber: 246,
+                                        lineNumber: 247,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2608,13 +2619,13 @@ function QueryPage() {
                                         children: formatPreviewText((0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$utils$2f$prompt$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["generateHumanPrompt"])(appState, customParsedPrompt) || "No query to preview")
                                     }, void 0, false, {
                                         fileName: "[project]/frontend/src/app/page.tsx",
-                                        lineNumber: 247,
+                                        lineNumber: 248,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/frontend/src/app/page.tsx",
-                                lineNumber: 245,
+                                lineNumber: 246,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2625,18 +2636,18 @@ function QueryPage() {
                                     children: "Review & Submit for Analysis"
                                 }, void 0, false, {
                                     fileName: "[project]/frontend/src/app/page.tsx",
-                                    lineNumber: 252,
+                                    lineNumber: 253,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/frontend/src/app/page.tsx",
-                                lineNumber: 251,
+                                lineNumber: 252,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/frontend/src/app/page.tsx",
-                        lineNumber: 244,
+                        lineNumber: 245,
                         columnNumber: 11
                     }, this)
                 ]
@@ -2651,7 +2662,7 @@ function QueryPage() {
                 onClose: ()=>setShowPromptModal(false)
             }, void 0, false, {
                 fileName: "[project]/frontend/src/app/page.tsx",
-                lineNumber: 268,
+                lineNumber: 269,
                 columnNumber: 9
             }, this)
         ]

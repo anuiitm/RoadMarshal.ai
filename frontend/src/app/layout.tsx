@@ -5,6 +5,9 @@ import React from "react";
 export const metadata = {
   title: "RoadMarshal AI",
   description: "Road safety intervention assistant",
+  icons: {
+    icon: '/logo.png',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

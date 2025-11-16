@@ -195,6 +195,7 @@ export default function QueryPage() {
 
         
         <header className="text-center mb-10">
+          <img src="/logo.png" alt="RoadMarshal AI Logo" className="h-20 w-20 block mx-auto" />
           <h1 className="text-3xl font-bold">Hi There !! I am RoadMarshal.AI</h1>
           <h2 className="text-lg font-bold text-zinc-700 dark:text-zinc-200 mt-3">
             I am here to assist you with road safety interventions. Please Select your Query

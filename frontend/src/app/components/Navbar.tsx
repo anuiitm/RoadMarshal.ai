@@ -10,7 +10,7 @@ export default function Navbar() {
     <nav className="w-full bg-white/60 dark:bg-zinc-900/60 backdrop-blur sticky top-0 z-40 border-b">
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3">
-          <div className="h-8 w-8 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-md" />
+          <img src="/logo.png" alt="RoadMarshal AI Logo" className="h-10 w-10" />
           <span className="font-semibold">RoadMarshal.AI</span>
         </Link>
 
