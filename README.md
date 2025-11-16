@@ -57,8 +57,8 @@ Follow these steps to set up and run the RoadMarshal AI project locally.
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
-cd RoadMarshal_AI
+git clone https://github.com/anuiitm/RoadMarshal.ai.git
+cd RoadMarshal.ai
 ```
 
 ### 2. Backend Setup
