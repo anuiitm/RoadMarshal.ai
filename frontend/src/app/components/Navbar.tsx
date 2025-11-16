@@ -1,4 +1,3 @@
-// frontend/src/app/components/Navbar.tsx
 "use client";
 import Link from "next/link";
 import { Sun, Moon } from "lucide-react";

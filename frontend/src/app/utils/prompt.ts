@@ -5,7 +5,6 @@ export type AppState = Record<string, CategoryState>;
 
 export function generateHumanPrompt(state: AppState, customParsedPrompt?: string | null): string {
   if (!state || Object.keys(state).length === 0) {
-    // If only custom prompt exists, return it as is (already formatted)
     if (customParsedPrompt) {
       return customParsedPrompt;
     }
@@ -34,13 +33,10 @@ export function generateHumanPrompt(state: AppState, customParsedPrompt?: string
         }
       }
     }
-    // Add newline after each category is done
     parts.push("\n");
   }
   if (customParsedPrompt) {
     parts.push("**Custom Query:**");
-    // customParsedPrompt is already formatted with all fields including Final prompt
-    // Split by newlines and indent each line
     const customLines = customParsedPrompt.split('\n');
     customLines.forEach(line => {
       parts.push(`    ${line}`);

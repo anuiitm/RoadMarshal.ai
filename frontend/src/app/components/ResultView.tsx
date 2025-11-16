@@ -1,4 +1,3 @@
-// frontend/src/app/components/ResultView.tsx
 "use client";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
 import html2canvas from "html2canvas";
@@ -16,23 +15,22 @@ export default function ResultView({ result, onRestart }: { result: any; onResta
         backgroundColor: "#ffffff",
         useCORS: true,
         logging: false,
-        scale: 2, // <-- RE-ENABLED for sharp text
+        scale: 2, 
         
         onclone: (clonedDoc) => {
           const clonedRoot = clonedDoc.getElementById("result-root");
           if (!clonedRoot) return;
           
-          // 1. Nuke stylesheets
+
           clonedDoc.querySelectorAll('style, link[rel="stylesheet"]').forEach(styleEl => {
             styleEl.remove();
           });
           
-          // 2. Force width on root
+
           (clonedRoot as HTMLElement).style.width = "800px";
           (clonedRoot as HTMLElement).style.boxSizing = "border-box";
           (clonedRoot as HTMLElement).style.fontFamily = "Arial, sans-serif"; // Base font
           
-          // 3. Walk all child elements
           const walker = clonedDoc.createTreeWalker(
             clonedRoot,
             NodeFilter.SHOW_ELEMENT
@@ -43,14 +41,12 @@ export default function ResultView({ result, onRestart }: { result: any; onResta
             const elem = node as HTMLElement;
             const tagName = elem.tagName.toLowerCase();
             
-            // Wipe all styling attributes
             elem.removeAttribute("class");
             elem.removeAttribute("data-theme");
             elem.removeAttribute("style");
             
-            // Apply universal safe styles
             elem.style.color = "#000000";
-            elem.style.backgroundColor = "transparent"; // Let root bg show
+            elem.style.backgroundColor = "transparent"; 
             elem.style.border = "none";
             elem.style.textDecoration = "none";
             elem.style.boxShadow = "none";
@@ -58,18 +54,14 @@ export default function ResultView({ result, onRestart }: { result: any; onResta
             elem.style.whiteSpace = "normal";
             elem.style.wordWrap = "break-word";
 
-            // === FIX FOR TEXT CLIPPING & QUALITY ===
-            // Apply font styles and padding *only* to elements that typically hold text.
             if (['p', 'li', 'h1', 'h2', 'h3', 'h4', 'div', 'span'].includes(tagName)) {
                 elem.style.fontFamily = "Arial, sans-serif";
                 elem.style.fontSize = "16px";
                 elem.style.lineHeight = "1.5";
-                // THIS IS THE FIX: Add vertical padding for "breathing room"
                 elem.style.paddingTop = "2px";
                 elem.style.paddingBottom = "2px";
             }
 
-            // Add back basic semantic styling
             if (['h1', 'h2', 'h3', 'h4'].includes(tagName)) {
                 elem.style.fontWeight = "bold";
                 elem.style.margin = "16px 0 8px 0";
@@ -77,18 +69,16 @@ export default function ResultView({ result, onRestart }: { result: any; onResta
             if (tagName === 'h1') elem.style.fontSize = "24px";
             if (tagName === 'h2') elem.style.fontSize = "20px";
 
-            // Fix list rendering
             if (tagName === 'ul' || tagName === 'ol') {
-                elem.style.paddingLeft = "40px"; // Indent list
+                elem.style.paddingLeft = "40px"; 
                 elem.style.margin = "10px 0";
             }
             if (tagName === 'li') {
-                elem.style.listStylePosition = "outside"; // Show bullets
+                elem.style.listStylePosition = "outside"; 
                 elem.style.display = "list-item";
             }
           }
           
-          // 4. Style the root element itself
           (clonedRoot as HTMLElement).style.backgroundColor = "#ffffff";
           (clonedRoot as HTMLElement).style.color = "#000000";
           (clonedRoot as HTMLElement).style.padding = "40px";
@@ -111,7 +101,6 @@ export default function ResultView({ result, onRestart }: { result: any; onResta
       const pageHeightWithMargin = pdfPageHeight - (margin * 2);
 
       if (usableHeight > pageHeightWithMargin) {
-        // --- Multi-page logic (REVISED) ---
         let heightLeft = usableHeight;
         let position = margin;
         
@@ -121,13 +110,12 @@ export default function ResultView({ result, onRestart }: { result: any; onResta
         let page = 1;
         while (heightLeft > 0) {
           pdf.addPage();
-          position = margin - (pageHeightWithMargin * page); // Corrected position
+          position = margin - (pageHeightWithMargin * page); 
           pdf.addImage(img, 'PNG', margin, position, usableWidth, usableHeight);
           heightLeft -= pageHeightWithMargin;
           page++;
         }
       } else {
-        // --- Single-page logic ---
         pdf.addImage(img, "PNG", margin, margin, usableWidth, usableHeight);
       }
       
@@ -140,7 +128,6 @@ export default function ResultView({ result, onRestart }: { result: any; onResta
   };
 
   return (
-    // ... (Your JSX remains the same)
     <div className="space-y-4">
       <div id="result-root" className="p-4 bg-white dark:bg-zinc-900 border rounded">
         <MarkdownRenderer content={answer} />

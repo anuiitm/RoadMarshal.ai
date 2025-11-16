@@ -148,7 +148,6 @@ __turbopack_context__.s([
 ]);
 function generateHumanPrompt(state, customParsedPrompt) {
     if (!state || Object.keys(state).length === 0) {
-        // If only custom prompt exists, return it as is (already formatted)
         if (customParsedPrompt) {
             return customParsedPrompt;
         }
@@ -176,13 +175,10 @@ function generateHumanPrompt(state, customParsedPrompt) {
                 }
             }
         }
-        // Add newline after each category is done
         parts.push("\n");
     }
     if (customParsedPrompt) {
         parts.push("**Custom Query:**");
-        // customParsedPrompt is already formatted with all fields including Final prompt
-        // Split by newlines and indent each line
         const customLines = customParsedPrompt.split('\n');
         customLines.forEach((line)=>{
             parts.push(`    ${line}`);
@@ -350,7 +346,6 @@ __turbopack_context__.s([
 function computeIssuesForCategory(category, catalog) {
     if (!catalog || !catalog[category]) return [];
     const allIssues = new Set();
-    // category → each subtype → problems[]
     Object.values(catalog[category]).forEach((sub)=>{
         if (sub.problems && Array.isArray(sub.problems)) {
             sub.problems.forEach((p)=>allIssues.add(p));
@@ -407,10 +402,8 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$
 ;
 function CategoryCard({ id, catalog, value, onChange }) {
     const issuesAvailable = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$lib$2f$computeIssues$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["computeIssuesForCategory"])(id, catalog);
-    // Convert CategoryState to internal Row format
     const categoryStateToRows = (state)=>{
         const rows = [];
-        // CategoryState structure: { [issueName]: { rows: [{ problems: [subtypeNames], speed, notes }] } }
         Object.entries(state).forEach(([issueName, typeState])=>{
             typeState.rows.forEach((row)=>{
                 rows.push({
@@ -432,12 +425,10 @@ function CategoryCard({ id, catalog, value, onChange }) {
             }
         ];
     };
-    // Convert internal Row format to CategoryState
     const rowsToCategoryState = (rows)=>{
         const state = {};
         rows.forEach((row)=>{
             if (!row.issue || row.subtypes.length === 0) return;
-            // Group by issue
             const issueKey = row.issue;
             if (!state[issueKey]) {
                 state[issueKey] = {
@@ -454,24 +445,18 @@ function CategoryCard({ id, catalog, value, onChange }) {
     };
     const [rows, setRows] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(()=>categoryStateToRows(value || {}));
     const [lastValue, setLastValue] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(()=>JSON.stringify(value || {}));
-    // Local state for inputs to prevent auto-save on every keystroke
     const [localInputs, setLocalInputs] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])({});
-    // Ref to track if the change is internal (to prevent sync loop)
     const isInternalUpdate = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(false);
-    // Sync with external value changes (only when value actually changes)
-    // IMPORTANT: Preserve openStep values when syncing to avoid resetting step navigation
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
         if (isInternalUpdate.current) {
             isInternalUpdate.current = false;
-            return; // Skip sync if change was internal
+            return;
         }
         const newValueStr = JSON.stringify(value || {});
         if (newValueStr !== lastValue) {
             setRows((currentRows)=>{
                 const newRows = categoryStateToRows(value || {});
-                // Preserve openStep from current rows by matching issue+subtypes
                 const preservedRows = newRows.map((newRow)=>{
-                    // Try to find matching row in current rows to preserve openStep
                     const matchingRow = currentRows.find((r)=>r.issue === newRow.issue && JSON.stringify(r.subtypes.sort()) === JSON.stringify(newRow.subtypes.sort()) && r.speed === newRow.speed && r.notes === newRow.notes);
                     if (matchingRow && matchingRow.openStep) {
                         return {
@@ -484,7 +469,6 @@ function CategoryCard({ id, catalog, value, onChange }) {
                 return preservedRows;
             });
             setLastValue(newValueStr);
-            // Clear local inputs when external value changes
             setLocalInputs({});
         }
     }, [
@@ -505,12 +489,11 @@ function CategoryCard({ id, catalog, value, onChange }) {
             ...next[i],
             ...patch
         };
-        // whenever issue changes → reset subtypes and speed/notes
         if (patch.issue && patch.issue !== oldIssue && oldIssue) {
             next[i].subtypes = [];
             next[i].speed = "";
             next[i].notes = "";
-            next[i].openStep = 2; // Go to step 2 when issue changes
+            next[i].openStep = 2;
         }
         updateRows(next);
     };
@@ -555,7 +538,7 @@ function CategoryCard({ id, catalog, value, onChange }) {
                     children: id
                 }, void 0, false, {
                     fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                    lineNumber: 164,
+                    lineNumber: 152,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -563,13 +546,13 @@ function CategoryCard({ id, catalog, value, onChange }) {
                     children: "Loading catalog..."
                 }, void 0, false, {
                     fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                    lineNumber: 165,
+                    lineNumber: 153,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-            lineNumber: 163,
+            lineNumber: 151,
             columnNumber: 7
         }, this);
     }
@@ -589,7 +572,6 @@ function CategoryCard({ id, catalog, value, onChange }) {
         }
         return "pending";
     };
-    // Display name mapping for better UI
     const getDisplayName = (categoryId)=>{
         if (categoryId === "Traffic Calming Measures") return "Traffic Calming";
         return categoryId;
@@ -604,12 +586,12 @@ function CategoryCard({ id, catalog, value, onChange }) {
                     children: getDisplayName(id)
                 }, void 0, false, {
                     fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                    lineNumber: 196,
+                    lineNumber: 183,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                lineNumber: 195,
+                lineNumber: 182,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -634,7 +616,7 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                 children: i + 1
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                lineNumber: 218,
+                                                lineNumber: 204,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -645,13 +627,13 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                lineNumber: 221,
+                                                lineNumber: 207,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                        lineNumber: 217,
+                                        lineNumber: 203,
                                         columnNumber: 15
                                     }, this),
                                     i > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -664,20 +646,20 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                 className: "w-4 h-4 mr-1"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                lineNumber: 231,
+                                                lineNumber: 217,
                                                 columnNumber: 19
                                             }, this),
                                             "Remove"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                        lineNumber: 225,
+                                        lineNumber: 211,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                lineNumber: 216,
+                                lineNumber: 202,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -693,19 +675,19 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                         className: "w-4 h-4 text-emerald-600 dark:text-emerald-400"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                        lineNumber: 242,
+                                                        lineNumber: 227,
                                                         columnNumber: 21
                                                     }, this) : step1Status === "active" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Circle$3e$__["Circle"], {
                                                         className: "w-4 h-4 text-emerald-600 dark:text-emerald-400 fill-emerald-600 dark:fill-emerald-400"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                        lineNumber: 244,
+                                                        lineNumber: 229,
                                                         columnNumber: 21
                                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Circle$3e$__["Circle"], {
                                                         className: "w-4 h-4 text-zinc-400 dark:text-zinc-600"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                        lineNumber: 246,
+                                                        lineNumber: 231,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -713,13 +695,13 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                         children: "1. Select Issue"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                        lineNumber: 248,
+                                                        lineNumber: 233,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                lineNumber: 240,
+                                                lineNumber: 225,
                                                 columnNumber: 17
                                             }, this),
                                             row.openStep !== 1 && row.issue && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -732,13 +714,13 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                 children: "Edit"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                lineNumber: 254,
+                                                lineNumber: 239,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                        lineNumber: 239,
+                                        lineNumber: 224,
                                         columnNumber: 15
                                     }, this),
                                     row.openStep === 1 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -749,7 +731,7 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                 children: "Choose the issue you want to address:"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                lineNumber: 267,
+                                                lineNumber: 252,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -763,18 +745,18 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                             })
                                                     }, iss, false, {
                                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                        lineNumber: 270,
+                                                        lineNumber: 255,
                                                         columnNumber: 23
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                lineNumber: 268,
+                                                lineNumber: 253,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                        lineNumber: 266,
+                                        lineNumber: 251,
                                         columnNumber: 17
                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "pl-6",
@@ -785,7 +767,7 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                     className: "w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400"
                                                 }, void 0, false, {
                                                     fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                    lineNumber: 288,
+                                                    lineNumber: 273,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -793,31 +775,31 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                     children: row.issue
                                                 }, void 0, false, {
                                                     fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                    lineNumber: 289,
+                                                    lineNumber: 274,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                            lineNumber: 287,
+                                            lineNumber: 272,
                                             columnNumber: 21
                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                             className: "text-sm text-zinc-400 dark:text-zinc-600",
                                             children: "No issue selected"
                                         }, void 0, false, {
                                             fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                            lineNumber: 292,
+                                            lineNumber: 277,
                                             columnNumber: 21
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                        lineNumber: 285,
+                                        lineNumber: 270,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                lineNumber: 238,
+                                lineNumber: 223,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -833,25 +815,25 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                         className: "w-4 h-4 text-emerald-600 dark:text-emerald-400"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                        lineNumber: 303,
+                                                        lineNumber: 287,
                                                         columnNumber: 21
                                                     }, this) : step2Status === "active" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Circle$3e$__["Circle"], {
                                                         className: "w-4 h-4 text-emerald-600 dark:text-emerald-400 fill-emerald-600 dark:fill-emerald-400"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                        lineNumber: 305,
+                                                        lineNumber: 289,
                                                         columnNumber: 21
                                                     }, this) : step2Status === "disabled" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Circle$3e$__["Circle"], {
                                                         className: "w-4 h-4 text-zinc-300 dark:text-zinc-700"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                        lineNumber: 307,
+                                                        lineNumber: 291,
                                                         columnNumber: 21
                                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Circle$3e$__["Circle"], {
                                                         className: "w-4 h-4 text-zinc-400 dark:text-zinc-600"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                        lineNumber: 309,
+                                                        lineNumber: 293,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -859,13 +841,13 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                         children: "2. Select Subtypes"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                        lineNumber: 311,
+                                                        lineNumber: 295,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                lineNumber: 301,
+                                                lineNumber: 285,
                                                 columnNumber: 17
                                             }, this),
                                             row.openStep !== 2 && row.subtypes.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -878,13 +860,13 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                 children: "Edit"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                lineNumber: 320,
+                                                lineNumber: 304,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                        lineNumber: 300,
+                                        lineNumber: 284,
                                         columnNumber: 15
                                     }, this),
                                     row.openStep === 2 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -895,7 +877,7 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                 children: "Select one or more subtypes:"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                lineNumber: 333,
+                                                lineNumber: 317,
                                                 columnNumber: 19
                                             }, this),
                                             subtypesAvailable.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -903,7 +885,7 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                 children: "No subtypes available for this issue."
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                lineNumber: 335,
+                                                lineNumber: 319,
                                                 columnNumber: 21
                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
                                                 children: [
@@ -915,19 +897,18 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                                 onClick: ()=>toggleSubtype(i, s)
                                                             }, s, false, {
                                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                                lineNumber: 342,
+                                                                lineNumber: 326,
                                                                 columnNumber: 27
                                                             }, this))
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                        lineNumber: 340,
+                                                        lineNumber: 324,
                                                         columnNumber: 23
                                                     }, this),
                                                     row.subtypes.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                         className: "flex justify-end pt-2",
                                                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
                                                             onClick: ()=>{
-                                                                // Directly update the row's openStep to 3
                                                                 updateField(i, {
                                                                     openStep: 3
                                                                 });
@@ -940,18 +921,18 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                                     className: "w-3.5 h-3.5 ml-1"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                                    lineNumber: 361,
+                                                                    lineNumber: 344,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                            lineNumber: 352,
+                                                            lineNumber: 336,
                                                             columnNumber: 27
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                        lineNumber: 351,
+                                                        lineNumber: 335,
                                                         columnNumber: 25
                                                     }, this)
                                                 ]
@@ -959,7 +940,7 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                        lineNumber: 332,
+                                        lineNumber: 316,
                                         columnNumber: 17
                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "pl-6",
@@ -971,7 +952,7 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                     onClick: ()=>toggleSubtype(i, s)
                                                 }, s, false, {
                                                     fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                    lineNumber: 374,
+                                                    lineNumber: 357,
                                                     columnNumber: 27
                                                 }, this)) : row.subtypes.map((s)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                     className: "inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg",
@@ -980,7 +961,7 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                             className: "w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400"
                                                         }, void 0, false, {
                                                             fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                            lineNumber: 387,
+                                                            lineNumber: 370,
                                                             columnNumber: 29
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -988,36 +969,36 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                             children: s
                                                         }, void 0, false, {
                                                             fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                            lineNumber: 388,
+                                                            lineNumber: 371,
                                                             columnNumber: 29
                                                         }, this)
                                                     ]
                                                 }, s, true, {
                                                     fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                    lineNumber: 383,
+                                                    lineNumber: 366,
                                                     columnNumber: 27
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                            lineNumber: 371,
+                                            lineNumber: 354,
                                             columnNumber: 21
                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                             className: "text-sm text-zinc-400 dark:text-zinc-600",
                                             children: !row.issue ? "Select an issue first" : "No subtypes selected"
                                         }, void 0, false, {
                                             fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                            lineNumber: 394,
+                                            lineNumber: 377,
                                             columnNumber: 21
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                        lineNumber: 369,
+                                        lineNumber: 352,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                lineNumber: 299,
+                                lineNumber: 283,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1033,25 +1014,25 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                         className: "w-4 h-4 text-emerald-600 dark:text-emerald-400"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                        lineNumber: 407,
+                                                        lineNumber: 389,
                                                         columnNumber: 21
                                                     }, this) : step3Status === "active" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Circle$3e$__["Circle"], {
                                                         className: "w-4 h-4 text-emerald-600 dark:text-emerald-400 fill-emerald-600 dark:fill-emerald-400"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                        lineNumber: 409,
+                                                        lineNumber: 391,
                                                         columnNumber: 21
                                                     }, this) : step3Status === "disabled" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Circle$3e$__["Circle"], {
                                                         className: "w-4 h-4 text-zinc-300 dark:text-zinc-700"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                        lineNumber: 411,
+                                                        lineNumber: 393,
                                                         columnNumber: 21
                                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Circle$3e$__["Circle"], {
                                                         className: "w-4 h-4 text-zinc-400 dark:text-zinc-600"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                        lineNumber: 413,
+                                                        lineNumber: 395,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1059,13 +1040,13 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                         children: "3. Speed & Notes"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                        lineNumber: 415,
+                                                        lineNumber: 397,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                lineNumber: 405,
+                                                lineNumber: 387,
                                                 columnNumber: 17
                                             }, this),
                                             row.openStep !== 3 && (row.speed || row.notes) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -1087,13 +1068,13 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                 children: "Edit"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                lineNumber: 424,
+                                                lineNumber: 406,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                        lineNumber: 404,
+                                        lineNumber: 386,
                                         columnNumber: 15
                                     }, this),
                                     row.openStep === 3 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1104,7 +1085,7 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                 children: "Add additional details (optional):"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                lineNumber: 440,
+                                                lineNumber: 422,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1118,7 +1099,7 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                                 children: "Speed"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                                lineNumber: 443,
+                                                                lineNumber: 425,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -1136,13 +1117,13 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                                 className: "w-full"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                                lineNumber: 444,
+                                                                lineNumber: 426,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                        lineNumber: 442,
+                                                        lineNumber: 424,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1153,7 +1134,7 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                                 children: "Notes"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                                lineNumber: 461,
+                                                                lineNumber: 443,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -1171,19 +1152,19 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                                 className: "w-full"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                                lineNumber: 462,
+                                                                lineNumber: 444,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                        lineNumber: 460,
+                                                        lineNumber: 442,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                lineNumber: 441,
+                                                lineNumber: 423,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1213,24 +1194,24 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                             className: "w-3.5 h-3.5 ml-1"
                                                         }, void 0, false, {
                                                             fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                            lineNumber: 495,
+                                                            lineNumber: 477,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                    lineNumber: 480,
+                                                    lineNumber: 462,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                lineNumber: 479,
+                                                lineNumber: 461,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                        lineNumber: 439,
+                                        lineNumber: 421,
                                         columnNumber: 17
                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "pl-6",
@@ -1247,12 +1228,12 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                        lineNumber: 505,
+                                                        lineNumber: 487,
                                                         columnNumber: 27
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                    lineNumber: 504,
+                                                    lineNumber: 486,
                                                     columnNumber: 25
                                                 }, this),
                                                 row.notes && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1265,36 +1246,36 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                        lineNumber: 512,
+                                                        lineNumber: 494,
                                                         columnNumber: 27
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                    lineNumber: 511,
+                                                    lineNumber: 493,
                                                     columnNumber: 25
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                            lineNumber: 502,
+                                            lineNumber: 484,
                                             columnNumber: 21
                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                             className: "text-sm text-zinc-400 dark:text-zinc-600",
                                             children: step3Status === "disabled" ? "Complete previous steps first" : "No speed or notes added"
                                         }, void 0, false, {
                                             fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                            lineNumber: 519,
+                                            lineNumber: 501,
                                             columnNumber: 21
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                        lineNumber: 500,
+                                        lineNumber: 482,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                lineNumber: 403,
+                                lineNumber: 385,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1307,25 +1288,25 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                 className: "w-4 h-4 text-emerald-600 dark:text-emerald-400"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                lineNumber: 531,
+                                                lineNumber: 512,
                                                 columnNumber: 19
                                             }, this) : step4Status === "active" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Circle$3e$__["Circle"], {
                                                 className: "w-4 h-4 text-emerald-600 dark:text-emerald-400 fill-emerald-600 dark:fill-emerald-400"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                lineNumber: 533,
+                                                lineNumber: 514,
                                                 columnNumber: 19
                                             }, this) : step4Status === "disabled" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Circle$3e$__["Circle"], {
                                                 className: "w-4 h-4 text-zinc-300 dark:text-zinc-700"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                lineNumber: 535,
+                                                lineNumber: 516,
                                                 columnNumber: 19
                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Circle$3e$__["Circle"], {
                                                 className: "w-4 h-4 text-zinc-400 dark:text-zinc-600"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                lineNumber: 537,
+                                                lineNumber: 518,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1333,13 +1314,13 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                 children: "4. Preview"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                lineNumber: 539,
+                                                lineNumber: 520,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                        lineNumber: 529,
+                                        lineNumber: 510,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1352,12 +1333,12 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                     children: preview(row)
                                                 }, void 0, false, {
                                                     fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                    lineNumber: 550,
+                                                    lineNumber: 531,
                                                     columnNumber: 19
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                lineNumber: 549,
+                                                lineNumber: 530,
                                                 columnNumber: 17
                                             }, this),
                                             row.openStep === 4 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1371,36 +1352,36 @@ function CategoryCard({ id, catalog, value, onChange }) {
                                                     children: "Edit All"
                                                 }, void 0, false, {
                                                     fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                    lineNumber: 557,
+                                                    lineNumber: 538,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                                lineNumber: 556,
+                                                lineNumber: 537,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                        lineNumber: 548,
+                                        lineNumber: 529,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                                lineNumber: 528,
+                                lineNumber: 509,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, i, true, {
                         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                        lineNumber: 211,
+                        lineNumber: 198,
                         columnNumber: 11
                     }, this);
                 })
             }, void 0, false, {
                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                lineNumber: 198,
+                lineNumber: 185,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1415,25 +1396,25 @@ function CategoryCard({ id, catalog, value, onChange }) {
                             className: "w-3.5 h-3.5 mr-2"
                         }, void 0, false, {
                             fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                            lineNumber: 582,
+                            lineNumber: 562,
                             columnNumber: 11
                         }, this),
                         "Add Another Issue"
                     ]
                 }, void 0, true, {
                     fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                    lineNumber: 576,
+                    lineNumber: 556,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-                lineNumber: 575,
+                lineNumber: 555,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/frontend/src/app/components/CategoryCard.tsx",
-        lineNumber: 194,
+        lineNumber: 181,
         columnNumber: 5
     }, this);
 }
@@ -1482,7 +1463,6 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$
 ;
 ;
 ;
-// Format text with bold markdown
 function formatPromptText(text) {
     const parts = [];
     const lines = text.split('\n');
@@ -1493,26 +1473,22 @@ function formatPromptText(text) {
         let match;
         const lineParts = [];
         while((match = boldRegex.exec(line)) !== null){
-            // Add text before the match
             if (match.index > lastIndex) {
                 lineParts.push(line.substring(lastIndex, match.index));
             }
-            // Add bold text
             lineParts.push(/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
                 className: "font-bold text-zinc-900 dark:text-zinc-100",
                 children: match[1]
             }, `bold-${key++}`, false, {
                 fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                lineNumber: 28,
+                lineNumber: 25,
                 columnNumber: 9
             }, this));
             lastIndex = match.index + match[0].length;
         }
-        // Add remaining text
         if (lastIndex < line.length) {
             lineParts.push(line.substring(lastIndex));
         }
-        // If no matches, use the line as is
         if (lineParts.length === 0) {
             lineParts.push(line);
         }
@@ -1520,48 +1496,38 @@ function formatPromptText(text) {
             children: lineParts
         }, `line-${idx}`, false, {
             fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-            lineNumber: 46,
+            lineNumber: 41,
             columnNumber: 7
         }, this));
-        // Add newline except for last line
         if (idx < lines.length - 1) {
             parts.push('\n');
         }
     });
     return parts;
 }
-// Helper function to format parsed query in human-readable format
 function formatCustomQuery(parsed) {
     if (!parsed) return "";
-    console.log('formatCustomQuery input:', parsed, typeof parsed); // Debug log
+    console.log('formatCustomQuery input:', parsed, typeof parsed);
     try {
-        // If it's already a string, try to parse it as JSON
         let data = parsed;
         if (typeof parsed === 'string') {
-            // Remove markdown code block markers if present (```json ... ```)
             let cleaned = parsed.trim();
             if (cleaned.startsWith('```')) {
-                // Remove opening ```json or ```
                 cleaned = cleaned.replace(/^```(?:json)?\s*\n?/i, '');
-                // Remove closing ```
                 cleaned = cleaned.replace(/\n?```\s*$/g, '');
                 cleaned = cleaned.trim();
             }
             try {
-                // Parse the cleaned JSON string
                 data = JSON.parse(cleaned);
             } catch (parseError) {
                 console.error('JSON parse error:', parseError, 'Cleaned string:', cleaned);
-                // If it's not valid JSON, return as is
                 return parsed;
             }
         }
-        // If data is not an object, return string representation
         if (typeof data !== 'object' || data === null) {
             return String(data);
         }
         const parts = [];
-        // Handle categories array
         if (data.categories && Array.isArray(data.categories)) {
             data.categories.forEach((cat)=>{
                 if (cat && typeof cat === 'object') {
@@ -1575,7 +1541,6 @@ function formatCustomQuery(parsed) {
                 }
             });
         }
-        // Add prompt as "Final prompt" in bold
         if (data.prompt) {
             parts.push(`**Final prompt**: ${data.prompt}`);
         }
@@ -1584,7 +1549,6 @@ function formatCustomQuery(parsed) {
         return result;
     } catch (error) {
         console.error('formatCustomQuery error:', error);
-        // If all else fails, return string representation
         return typeof parsed === 'string' ? parsed : JSON.stringify(parsed);
     }
 }
@@ -1600,24 +1564,18 @@ function CustomQueryBox({ onParsed }) {
         setLoading(true);
         try {
             const res = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$api$2f$backend$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["parseQuery"])(text);
-            // Get the actual parsed data - could be in parsed, raw, or directly in res
             let result = res.parsed || res.raw || res || null;
-            // If result is a string that looks like JSON, parse it
             if (typeof result === 'string' && result.trim().startsWith('{')) {
                 try {
                     result = JSON.parse(result);
-                } catch  {
-                // Keep as string if parsing fails
-                }
+                } catch  {}
             }
             setParsed(result);
-            // Format the parsed result into human-readable prompt
             const formatted = formatCustomQuery(result);
-            console.log('Formatted prompt:', formatted); // Debug log
+            console.log('Formatted prompt:', formatted);
             setFormattedPrompt(formatted);
             setIsEditing(false);
             setIsEditingPrompt(false);
-            // send formatted prompt text to parent (not JSON)
             if (onParsed) {
                 onParsed(formatted);
             }
@@ -1632,7 +1590,6 @@ function CustomQueryBox({ onParsed }) {
     };
     const handleSavePrompt = ()=>{
         setIsEditingPrompt(false);
-        // Send the edited prompt text to parent
         if (onParsed && formattedPrompt.trim()) {
             onParsed(formattedPrompt);
         }
@@ -1642,7 +1599,7 @@ function CustomQueryBox({ onParsed }) {
         setParsed(null);
         setFormattedPrompt("");
         if (onParsed) {
-            onParsed(null); // Clear parsed state in parent
+            onParsed(null);
         }
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1656,7 +1613,7 @@ function CustomQueryBox({ onParsed }) {
                         children: "Custom Query"
                     }, void 0, false, {
                         fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                        lineNumber: 202,
+                        lineNumber: 179,
                         columnNumber: 9
                     }, this),
                     parsed && !isEditing && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -1669,20 +1626,20 @@ function CustomQueryBox({ onParsed }) {
                                 className: "w-3.5 h-3.5 mr-1"
                             }, void 0, false, {
                                 fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                                lineNumber: 210,
+                                lineNumber: 187,
                                 columnNumber: 13
                             }, this),
                             "Edit Query"
                         ]
                     }, void 0, true, {
                         fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                        lineNumber: 204,
+                        lineNumber: 181,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                lineNumber: 201,
+                lineNumber: 178,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1694,7 +1651,7 @@ function CustomQueryBox({ onParsed }) {
                     className: "w-full min-h-[200px] bg-transparent"
                 }, void 0, false, {
                     fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                    lineNumber: 218,
+                    lineNumber: 195,
                     columnNumber: 11
                 }, this) : parsed ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "space-y-3",
@@ -1705,7 +1662,7 @@ function CustomQueryBox({ onParsed }) {
                         className: "w-full min-h-[200px] bg-transparent"
                     }, void 0, false, {
                         fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                        lineNumber: 227,
+                        lineNumber: 204,
                         columnNumber: 15
                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "p-3 bg-zinc-50 dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700",
@@ -1714,22 +1671,22 @@ function CustomQueryBox({ onParsed }) {
                             children: formatPromptText(formattedPrompt || formatCustomQuery(parsed))
                         }, void 0, false, {
                             fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                            lineNumber: 235,
+                            lineNumber: 212,
                             columnNumber: 17
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                        lineNumber: 234,
+                        lineNumber: 211,
                         columnNumber: 15
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                    lineNumber: 225,
+                    lineNumber: 202,
                     columnNumber: 11
                 }, this) : null
             }, void 0, false, {
                 fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                lineNumber: 216,
+                lineNumber: 193,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1743,7 +1700,7 @@ function CustomQueryBox({ onParsed }) {
                     children: loading ? "Parsing…" : "Analyze & Parse"
                 }, void 0, false, {
                     fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                    lineNumber: 247,
+                    lineNumber: 223,
                     columnNumber: 11
                 }, this) : parsed && formattedPrompt ? isEditingPrompt ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
                     onClick: handleSavePrompt,
@@ -1753,7 +1710,7 @@ function CustomQueryBox({ onParsed }) {
                     children: "Save Prompt"
                 }, void 0, false, {
                     fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                    lineNumber: 258,
+                    lineNumber: 234,
                     columnNumber: 13
                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
                     onClick: handleEditPrompt,
@@ -1765,25 +1722,25 @@ function CustomQueryBox({ onParsed }) {
                             className: "w-3.5 h-3.5 mr-1"
                         }, void 0, false, {
                             fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                            lineNumber: 273,
+                            lineNumber: 249,
                             columnNumber: 15
                         }, this),
                         "Edit Prompt"
                     ]
                 }, void 0, true, {
                     fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                    lineNumber: 267,
+                    lineNumber: 243,
                     columnNumber: 13
                 }, this) : null
             }, void 0, false, {
                 fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                lineNumber: 245,
+                lineNumber: 221,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-        lineNumber: 200,
+        lineNumber: 177,
         columnNumber: 5
     }, this);
 }
@@ -1791,7 +1748,6 @@ function CustomQueryBox({ onParsed }) {
 "[project]/frontend/src/app/components/LoadingView.tsx [app-ssr] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-// frontend/src/app/components/LoadingView.tsx
 __turbopack_context__.s([
     "default",
     ()=>LoadingView
@@ -1808,7 +1764,7 @@ function LoadingView({ message = "Please wait - I'm onto it." }) {
                     className: "animate-spin h-16 w-16 border-4 border-t-emerald-600 border-zinc-200 dark:border-zinc-700 rounded-full"
                 }, void 0, false, {
                     fileName: "[project]/frontend/src/app/components/LoadingView.tsx",
-                    lineNumber: 6,
+                    lineNumber: 5,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1818,23 +1774,23 @@ function LoadingView({ message = "Please wait - I'm onto it." }) {
                         children: message
                     }, void 0, false, {
                         fileName: "[project]/frontend/src/app/components/LoadingView.tsx",
-                        lineNumber: 8,
+                        lineNumber: 7,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/frontend/src/app/components/LoadingView.tsx",
-                    lineNumber: 7,
+                    lineNumber: 6,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/frontend/src/app/components/LoadingView.tsx",
-            lineNumber: 5,
+            lineNumber: 4,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/frontend/src/app/components/LoadingView.tsx",
-        lineNumber: 4,
+        lineNumber: 3,
         columnNumber: 5
     }, this);
 }
@@ -1933,7 +1889,6 @@ function MarkdownRenderer({ content }) {
                     }, void 0);
                 },
                 pre ({ children, ...props }) {
-                    // If the pre contains a code element, let the code component handle styling
                     if (children && typeof children === 'object' && 'props' in children && children.props.className) {
                         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
                             children: children
@@ -1945,7 +1900,7 @@ function MarkdownRenderer({ content }) {
                         children: children
                     }, void 0, false, {
                         fileName: "[project]/frontend/src/components/MarkdownRenderer.tsx",
-                        lineNumber: 30,
+                        lineNumber: 29,
                         columnNumber: 15
                     }, void 0);
                 }
@@ -1972,7 +1927,6 @@ module.exports = mod;
 "[project]/frontend/src/app/components/ResultView.tsx [app-ssr] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-// frontend/src/app/components/ResultView.tsx
 __turbopack_context__.s([
     "default",
     ()=>ResultView
@@ -2000,35 +1954,28 @@ function ResultView({ result, onRestart }) {
                 onclone: (clonedDoc)=>{
                     const clonedRoot = clonedDoc.getElementById("result-root");
                     if (!clonedRoot) return;
-                    // 1. Nuke stylesheets
                     clonedDoc.querySelectorAll('style, link[rel="stylesheet"]').forEach((styleEl)=>{
                         styleEl.remove();
                     });
-                    // 2. Force width on root
                     clonedRoot.style.width = "800px";
                     clonedRoot.style.boxSizing = "border-box";
                     clonedRoot.style.fontFamily = "Arial, sans-serif"; // Base font
-                    // 3. Walk all child elements
                     const walker = clonedDoc.createTreeWalker(clonedRoot, NodeFilter.SHOW_ELEMENT);
                     let node;
                     while(node = walker.nextNode()){
                         const elem = node;
                         const tagName = elem.tagName.toLowerCase();
-                        // Wipe all styling attributes
                         elem.removeAttribute("class");
                         elem.removeAttribute("data-theme");
                         elem.removeAttribute("style");
-                        // Apply universal safe styles
                         elem.style.color = "#000000";
-                        elem.style.backgroundColor = "transparent"; // Let root bg show
+                        elem.style.backgroundColor = "transparent";
                         elem.style.border = "none";
                         elem.style.textDecoration = "none";
                         elem.style.boxShadow = "none";
                         elem.style.overflow = "visible";
                         elem.style.whiteSpace = "normal";
                         elem.style.wordWrap = "break-word";
-                        // === FIX FOR TEXT CLIPPING & QUALITY ===
-                        // Apply font styles and padding *only* to elements that typically hold text.
                         if ([
                             'p',
                             'li',
@@ -2042,11 +1989,9 @@ function ResultView({ result, onRestart }) {
                             elem.style.fontFamily = "Arial, sans-serif";
                             elem.style.fontSize = "16px";
                             elem.style.lineHeight = "1.5";
-                            // THIS IS THE FIX: Add vertical padding for "breathing room"
                             elem.style.paddingTop = "2px";
                             elem.style.paddingBottom = "2px";
                         }
-                        // Add back basic semantic styling
                         if ([
                             'h1',
                             'h2',
@@ -2058,17 +2003,15 @@ function ResultView({ result, onRestart }) {
                         }
                         if (tagName === 'h1') elem.style.fontSize = "24px";
                         if (tagName === 'h2') elem.style.fontSize = "20px";
-                        // Fix list rendering
                         if (tagName === 'ul' || tagName === 'ol') {
-                            elem.style.paddingLeft = "40px"; // Indent list
+                            elem.style.paddingLeft = "40px";
                             elem.style.margin = "10px 0";
                         }
                         if (tagName === 'li') {
-                            elem.style.listStylePosition = "outside"; // Show bullets
+                            elem.style.listStylePosition = "outside";
                             elem.style.display = "list-item";
                         }
                     }
-                    // 4. Style the root element itself
                     clonedRoot.style.backgroundColor = "#ffffff";
                     clonedRoot.style.color = "#000000";
                     clonedRoot.style.padding = "40px";
@@ -2087,7 +2030,6 @@ function ResultView({ result, onRestart }) {
             const usableHeight = imgProps.height * usableWidth / imgProps.width;
             const pageHeightWithMargin = pdfPageHeight - margin * 2;
             if (usableHeight > pageHeightWithMargin) {
-                // --- Multi-page logic (REVISED) ---
                 let heightLeft = usableHeight;
                 let position = margin;
                 pdf.addImage(img, 'PNG', margin, position, usableWidth, usableHeight);
@@ -2095,13 +2037,12 @@ function ResultView({ result, onRestart }) {
                 let page = 1;
                 while(heightLeft > 0){
                     pdf.addPage();
-                    position = margin - pageHeightWithMargin * page; // Corrected position
+                    position = margin - pageHeightWithMargin * page;
                     pdf.addImage(img, 'PNG', margin, position, usableWidth, usableHeight);
                     heightLeft -= pageHeightWithMargin;
                     page++;
                 }
             } else {
-                // --- Single-page logic ---
                 pdf.addImage(img, "PNG", margin, margin, usableWidth, usableHeight);
             }
             pdf.save("roadmarshal-report.pdf");
@@ -2110,8 +2051,7 @@ function ResultView({ result, onRestart }) {
             alert("Failed to generate PDF. Please try again.");
         }
     };
-    return(// ... (Your JSX remains the same)
-    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "space-y-4",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2121,12 +2061,12 @@ function ResultView({ result, onRestart }) {
                     content: answer
                 }, void 0, false, {
                     fileName: "[project]/frontend/src/app/components/ResultView.tsx",
-                    lineNumber: 146,
+                    lineNumber: 133,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/frontend/src/app/components/ResultView.tsx",
-                lineNumber: 145,
+                lineNumber: 132,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2138,7 +2078,7 @@ function ResultView({ result, onRestart }) {
                         children: "Download PDF"
                     }, void 0, false, {
                         fileName: "[project]/frontend/src/app/components/ResultView.tsx",
-                        lineNumber: 150,
+                        lineNumber: 137,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2147,27 +2087,26 @@ function ResultView({ result, onRestart }) {
                         children: "Restart"
                     }, void 0, false, {
                         fileName: "[project]/frontend/src/app/components/ResultView.tsx",
-                        lineNumber: 151,
+                        lineNumber: 138,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/frontend/src/app/components/ResultView.tsx",
-                lineNumber: 149,
+                lineNumber: 136,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/frontend/src/app/components/ResultView.tsx",
-        lineNumber: 144,
+        lineNumber: 131,
         columnNumber: 5
-    }, this));
+    }, this);
 }
 }),
 "[project]/frontend/src/app/components/Navbar.tsx [app-ssr] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-// frontend/src/app/components/Navbar.tsx
 __turbopack_context__.s([
     "default",
     ()=>Navbar
@@ -2197,7 +2136,7 @@ function Navbar() {
                             className: "h-8 w-8 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-md"
                         }, void 0, false, {
                             fileName: "[project]/frontend/src/app/components/Navbar.tsx",
-                            lineNumber: 14,
+                            lineNumber: 13,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2205,13 +2144,13 @@ function Navbar() {
                             children: "RoadMarshal.AI"
                         }, void 0, false, {
                             fileName: "[project]/frontend/src/app/components/Navbar.tsx",
-                            lineNumber: 15,
+                            lineNumber: 14,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/frontend/src/app/components/Navbar.tsx",
-                    lineNumber: 13,
+                    lineNumber: 12,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2224,34 +2163,34 @@ function Navbar() {
                             className: "w-5 h-5"
                         }, void 0, false, {
                             fileName: "[project]/frontend/src/app/components/Navbar.tsx",
-                            lineNumber: 24,
+                            lineNumber: 23,
                             columnNumber: 33
                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$moon$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Moon$3e$__["Moon"], {
                             className: "w-5 h-5"
                         }, void 0, false, {
                             fileName: "[project]/frontend/src/app/components/Navbar.tsx",
-                            lineNumber: 24,
+                            lineNumber: 23,
                             columnNumber: 63
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/frontend/src/app/components/Navbar.tsx",
-                        lineNumber: 19,
+                        lineNumber: 18,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/frontend/src/app/components/Navbar.tsx",
-                    lineNumber: 18,
+                    lineNumber: 17,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/frontend/src/app/components/Navbar.tsx",
-            lineNumber: 12,
+            lineNumber: 11,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/frontend/src/app/components/Navbar.tsx",
-        lineNumber: 11,
+        lineNumber: 10,
         columnNumber: 5
     }, this);
 }
@@ -2259,7 +2198,6 @@ function Navbar() {
 "[project]/frontend/src/app/components/FinalPromptModal.tsx [app-ssr] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-// frontend/src/app/components/FinalPromptModal.tsx
 __turbopack_context__.s([
     "default",
     ()=>FinalPromptModal
@@ -2281,7 +2219,7 @@ function FinalPromptModal({ initial, onConfirm, onClose }) {
                     children: "I would like to confirm the prompt. Please review it. Please make changes if needed."
                 }, void 0, false, {
                     fileName: "[project]/frontend/src/app/components/FinalPromptModal.tsx",
-                    lineNumber: 19,
+                    lineNumber: 18,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
@@ -2290,7 +2228,7 @@ function FinalPromptModal({ initial, onConfirm, onClose }) {
                     className: "w-full min-h-[160px] p-3 bg-transparent border rounded"
                 }, void 0, false, {
                     fileName: "[project]/frontend/src/app/components/FinalPromptModal.tsx",
-                    lineNumber: 20,
+                    lineNumber: 19,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2302,7 +2240,7 @@ function FinalPromptModal({ initial, onConfirm, onClose }) {
                             children: "Cancel"
                         }, void 0, false, {
                             fileName: "[project]/frontend/src/app/components/FinalPromptModal.tsx",
-                            lineNumber: 22,
+                            lineNumber: 21,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2311,24 +2249,24 @@ function FinalPromptModal({ initial, onConfirm, onClose }) {
                             children: "Confirm & Run"
                         }, void 0, false, {
                             fileName: "[project]/frontend/src/app/components/FinalPromptModal.tsx",
-                            lineNumber: 23,
+                            lineNumber: 22,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/frontend/src/app/components/FinalPromptModal.tsx",
-                    lineNumber: 21,
+                    lineNumber: 20,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/frontend/src/app/components/FinalPromptModal.tsx",
-            lineNumber: 18,
+            lineNumber: 17,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/frontend/src/app/components/FinalPromptModal.tsx",
-        lineNumber: 17,
+        lineNumber: 16,
         columnNumber: 5
     }, this);
 }
@@ -2342,13 +2280,10 @@ __turbopack_context__.s([
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/frontend/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/frontend/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js [app-ssr] (ecmascript)");
-// Import your API functions
 var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$api$2f$backend$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/frontend/src/app/api/backend.ts [app-ssr] (ecmascript)");
-// Import your state and prompt logic
 var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$utils$2f$prompt$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/frontend/src/app/utils/prompt.ts [app-ssr] (ecmascript)");
-// Import all your UI components
-var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$components$2f$Chip$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/frontend/src/components/Chip.tsx [app-ssr] (ecmascript)"); // Uses the one in src/components/
-var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$components$2f$CategoryCard$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/frontend/src/app/components/CategoryCard.tsx [app-ssr] (ecmascript)"); // Uses the one in src/app/components/
+var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$components$2f$Chip$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/frontend/src/components/Chip.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$components$2f$CategoryCard$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/frontend/src/app/components/CategoryCard.tsx [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$components$2f$CustomQueryBox$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/frontend/src/app/components/CustomQueryBox.tsx [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$components$2f$LoadingView$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/frontend/src/app/components/LoadingView.tsx [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$components$2f$ResultView$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/frontend/src/app/components/ResultView.tsx [app-ssr] (ecmascript)");
@@ -2369,7 +2304,6 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$co
 function QueryPage() {
     const [catalog, setCatalog] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
     const [loadingCatalog, setLoadingCatalog] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(true);
-    // --- State Management ---
     const [appState, setAppState] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])({});
     const [customParsedPrompt, setCustomParsedPrompt] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
     const [selectedCategories, setSelectedCategories] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])([]);
@@ -2379,43 +2313,36 @@ function QueryPage() {
         "Traffic Calming Measures",
         "Custom Query"
     ];
-    // Display name mapping for better UI
     const getCategoryDisplayName = (category)=>{
         if (category === "Traffic Calming Measures") return "Traffic Calming";
         return category;
     };
-    // Format preview text to render bold markdown
     const formatPreviewText = (text)=>{
         const parts = [];
         const lines = text.split('\n');
         let key = 0;
         lines.forEach((line, idx)=>{
-            // Check for bold markdown **text**
             const boldRegex = /\*\*(.+?)\*\*/g;
             let lastIndex = 0;
             let match;
             const lineParts = [];
             while((match = boldRegex.exec(line)) !== null){
-                // Add text before the match
                 if (match.index > lastIndex) {
                     lineParts.push(line.substring(lastIndex, match.index));
                 }
-                // Add bold text
                 lineParts.push(/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
                     className: "font-bold text-zinc-900 dark:text-zinc-100",
                     children: match[1]
                 }, `bold-${key++}`, false, {
                     fileName: "[project]/frontend/src/app/page.tsx",
-                    lineNumber: 55,
+                    lineNumber: 45,
                     columnNumber: 11
                 }, this));
                 lastIndex = match.index + match[0].length;
             }
-            // Add remaining text
             if (lastIndex < line.length) {
                 lineParts.push(line.substring(lastIndex));
             }
-            // If no matches, use the line as is
             if (lineParts.length === 0) {
                 lineParts.push(line);
             }
@@ -2423,21 +2350,18 @@ function QueryPage() {
                 children: lineParts
             }, `line-${idx}`, false, {
                 fileName: "[project]/frontend/src/app/page.tsx",
-                lineNumber: 73,
+                lineNumber: 61,
                 columnNumber: 9
             }, this));
-            // Add newline except for last line
             if (idx < lines.length - 1) {
                 parts.push('\n');
             }
         });
         return parts;
     };
-    // --- AI Interaction State ---
     const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [result, setResult] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
     const [showPromptModal, setShowPromptModal] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
-    // 1. Load catalog on mount
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$api$2f$backend$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["fetchCatalog"])().then((data)=>{
             setCatalog(data);
@@ -2445,11 +2369,8 @@ function QueryPage() {
             setLoadingCatalog(false);
         });
     }, []);
-    // 2. Toggle category visibility
-    // Custom Query is mutually exclusive with other categories
     const toggleCategory = (cat)=>{
         if (selectedCategories.includes(cat)) {
-            // Deselecting the category
             setSelectedCategories(selectedCategories.filter((c)=>c !== cat));
             if (cat !== "Custom Query") {
                 setAppState((prev)=>{
@@ -2463,40 +2384,33 @@ function QueryPage() {
                 setCustomParsedPrompt(null);
             }
         } else {
-            // Selecting a category
             if (cat === "Custom Query") {
-                // If selecting Custom Query, deselect all others
                 setSelectedCategories([
                     "Custom Query"
                 ]);
-                setAppState({}); // Clear all other category states
+                setAppState({});
             } else {
-                // If selecting any other category, deselect Custom Query
                 setSelectedCategories([
                     ...selectedCategories.filter((c)=>c !== "Custom Query"),
                     cat
                 ]);
-                setCustomParsedPrompt(null); // Clear custom query
+                setCustomParsedPrompt(null);
             }
         }
     };
-    // 3. Handle updates from a CategoryCard
     const handleCategoryChange = (category, nextCategoryState)=>{
         setAppState((prev)=>({
                 ...prev,
                 [category]: nextCategoryState
             }));
     };
-    // 4. Handle updates from the CustomQueryBox
     const handleCustomQueryParsed = (parsed)=>{
-        // parsed is now the formatted prompt text (string)
         if (parsed && typeof parsed === 'string') {
             setCustomParsedPrompt(parsed);
         } else {
             setCustomParsedPrompt(null);
         }
     };
-    // 5. Reset everything
     const restartAll = ()=>{
         setAppState({});
         setCustomParsedPrompt(null);
@@ -2504,16 +2418,13 @@ function QueryPage() {
         setResult(null);
         setIsLoading(false);
     };
-    // 6. Show prompt preview
     const handleShowPrompt = ()=>{
         setShowPromptModal(true);
     };
-    // 7. Submit to AI (called from modal)
     const handleSubmit = async (confirmedPrompt)=>{
         setShowPromptModal(false);
         setIsLoading(true);
         setResult(null);
-        // Use the LLM prompt format for the API
         const finalPrompt = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$utils$2f$prompt$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["generateLLMPrompt"])(appState, customParsedPrompt);
         try {
             const res = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$api$2f$backend$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["sendQuery"])(finalPrompt);
@@ -2526,20 +2437,19 @@ function QueryPage() {
         }
         setIsLoading(false);
     };
-    // --- Render Logic ---
     if (loadingCatalog) {
         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$components$2f$Navbar$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                     fileName: "[project]/frontend/src/app/page.tsx",
-                    lineNumber: 190,
+                    lineNumber: 163,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$components$2f$LoadingView$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
                     message: "Loading catalog..."
                 }, void 0, false, {
                     fileName: "[project]/frontend/src/app/page.tsx",
-                    lineNumber: 191,
+                    lineNumber: 164,
                     columnNumber: 9
                 }, this)
             ]
@@ -2550,12 +2460,12 @@ function QueryPage() {
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$components$2f$Navbar$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                     fileName: "[project]/frontend/src/app/page.tsx",
-                    lineNumber: 199,
+                    lineNumber: 172,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$components$2f$LoadingView$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                     fileName: "[project]/frontend/src/app/page.tsx",
-                    lineNumber: 200,
+                    lineNumber: 173,
                     columnNumber: 9
                 }, this)
             ]
@@ -2566,7 +2476,7 @@ function QueryPage() {
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$components$2f$Navbar$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                     fileName: "[project]/frontend/src/app/page.tsx",
-                    lineNumber: 208,
+                    lineNumber: 181,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2576,12 +2486,12 @@ function QueryPage() {
                         onRestart: restartAll
                     }, void 0, false, {
                         fileName: "[project]/frontend/src/app/page.tsx",
-                        lineNumber: 210,
+                        lineNumber: 183,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/frontend/src/app/page.tsx",
-                    lineNumber: 209,
+                    lineNumber: 182,
                     columnNumber: 9
                 }, this)
             ]
@@ -2592,7 +2502,7 @@ function QueryPage() {
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$components$2f$Navbar$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                 fileName: "[project]/frontend/src/app/page.tsx",
-                lineNumber: 220,
+                lineNumber: 193,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2606,7 +2516,7 @@ function QueryPage() {
                                 children: "Hi There !! I am RoadMarshal.AI"
                             }, void 0, false, {
                                 fileName: "[project]/frontend/src/app/page.tsx",
-                                lineNumber: 225,
+                                lineNumber: 198,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -2614,13 +2524,13 @@ function QueryPage() {
                                 children: "I am here to assist you with road safety interventions. Please Select your Query"
                             }, void 0, false, {
                                 fileName: "[project]/frontend/src/app/page.tsx",
-                                lineNumber: 226,
+                                lineNumber: 199,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/frontend/src/app/page.tsx",
-                        lineNumber: 224,
+                        lineNumber: 197,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2631,12 +2541,12 @@ function QueryPage() {
                                 onClick: ()=>toggleCategory(cat)
                             }, cat, false, {
                                 fileName: "[project]/frontend/src/app/page.tsx",
-                                lineNumber: 236,
+                                lineNumber: 208,
                                 columnNumber: 13
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/frontend/src/app/page.tsx",
-                        lineNumber: 234,
+                        lineNumber: 206,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2649,7 +2559,7 @@ function QueryPage() {
                                     onChange: (next)=>handleCategoryChange(cat, next)
                                 }, cat, false, {
                                     fileName: "[project]/frontend/src/app/page.tsx",
-                                    lineNumber: 251,
+                                    lineNumber: 223,
                                     columnNumber: 15
                                 }, this)),
                             selectedCategories.includes("Custom Query") && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2660,23 +2570,23 @@ function QueryPage() {
                                         onParsed: handleCustomQueryParsed
                                     }, void 0, false, {
                                         fileName: "[project]/frontend/src/app/page.tsx",
-                                        lineNumber: 263,
+                                        lineNumber: 235,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/frontend/src/app/page.tsx",
-                                    lineNumber: 262,
+                                    lineNumber: 234,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/frontend/src/app/page.tsx",
-                                lineNumber: 261,
+                                lineNumber: 233,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/frontend/src/app/page.tsx",
-                        lineNumber: 246,
+                        lineNumber: 218,
                         columnNumber: 9
                     }, this),
                     canSubmit && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2690,7 +2600,7 @@ function QueryPage() {
                                         children: "Preview your query:"
                                     }, void 0, false, {
                                         fileName: "[project]/frontend/src/app/page.tsx",
-                                        lineNumber: 275,
+                                        lineNumber: 246,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2698,13 +2608,13 @@ function QueryPage() {
                                         children: formatPreviewText((0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$utils$2f$prompt$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["generateHumanPrompt"])(appState, customParsedPrompt) || "No query to preview")
                                     }, void 0, false, {
                                         fileName: "[project]/frontend/src/app/page.tsx",
-                                        lineNumber: 276,
+                                        lineNumber: 247,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/frontend/src/app/page.tsx",
-                                lineNumber: 274,
+                                lineNumber: 245,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2715,24 +2625,24 @@ function QueryPage() {
                                     children: "Review & Submit for Analysis"
                                 }, void 0, false, {
                                     fileName: "[project]/frontend/src/app/page.tsx",
-                                    lineNumber: 281,
+                                    lineNumber: 252,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/frontend/src/app/page.tsx",
-                                lineNumber: 280,
+                                lineNumber: 251,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/frontend/src/app/page.tsx",
-                        lineNumber: 273,
+                        lineNumber: 244,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/frontend/src/app/page.tsx",
-                lineNumber: 221,
+                lineNumber: 194,
                 columnNumber: 7
             }, this),
             showPromptModal && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$components$2f$FinalPromptModal$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -2741,7 +2651,7 @@ function QueryPage() {
                 onClose: ()=>setShowPromptModal(false)
             }, void 0, false, {
                 fileName: "[project]/frontend/src/app/page.tsx",
-                lineNumber: 298,
+                lineNumber: 268,
                 columnNumber: 9
             }, this)
         ]

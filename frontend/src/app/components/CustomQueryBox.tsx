@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Pencil } from "lucide-react";
 
-// Format text with bold markdown
 function formatPromptText(text: string): React.ReactNode[] {
   const parts: React.ReactNode[] = [];
   const lines = text.split('\n');
@@ -19,11 +18,9 @@ function formatPromptText(text: string): React.ReactNode[] {
     const lineParts: React.ReactNode[] = [];
     
     while ((match = boldRegex.exec(line)) !== null) {
-      // Add text before the match
       if (match.index > lastIndex) {
         lineParts.push(line.substring(lastIndex, match.index));
       }
-      // Add bold text
       lineParts.push(
         <strong key={`bold-${key++}`} className="font-bold text-zinc-900 dark:text-zinc-100">
           {match[1]}
@@ -32,12 +29,10 @@ function formatPromptText(text: string): React.ReactNode[] {
       lastIndex = match.index + match[0].length;
     }
     
-    // Add remaining text
     if (lastIndex < line.length) {
       lineParts.push(line.substring(lastIndex));
     }
     
-    // If no matches, use the line as is
     if (lineParts.length === 0) {
       lineParts.push(line);
     }
@@ -48,7 +43,6 @@ function formatPromptText(text: string): React.ReactNode[] {
       </span>
     );
     
-    // Add newline except for last line
     if (idx < lines.length - 1) {
       parts.push('\n');
     }
@@ -57,44 +51,35 @@ function formatPromptText(text: string): React.ReactNode[] {
   return parts;
 }
 
-// Helper function to format parsed query in human-readable format
 function formatCustomQuery(parsed: any): string {
   if (!parsed) return "";
   
-  console.log('formatCustomQuery input:', parsed, typeof parsed); // Debug log
+  console.log('formatCustomQuery input:', parsed, typeof parsed); 
   
   try {
-    // If it's already a string, try to parse it as JSON
     let data = parsed;
     if (typeof parsed === 'string') {
-      // Remove markdown code block markers if present (```json ... ```)
       let cleaned = parsed.trim();
       if (cleaned.startsWith('```')) {
-        // Remove opening ```json or ```
         cleaned = cleaned.replace(/^```(?:json)?\s*\n?/i, '');
-        // Remove closing ```
         cleaned = cleaned.replace(/\n?```\s*$/g, '');
         cleaned = cleaned.trim();
       }
       
       try {
-        // Parse the cleaned JSON string
         data = JSON.parse(cleaned);
       } catch (parseError) {
         console.error('JSON parse error:', parseError, 'Cleaned string:', cleaned);
-        // If it's not valid JSON, return as is
         return parsed;
       }
     }
     
-    // If data is not an object, return string representation
     if (typeof data !== 'object' || data === null) {
       return String(data);
     }
     
     const parts: string[] = [];
     
-    // Handle categories array
     if (data.categories && Array.isArray(data.categories)) {
       data.categories.forEach((cat: any) => {
         if (cat && typeof cat === 'object') {
@@ -109,7 +94,6 @@ function formatCustomQuery(parsed: any): string {
       });
     }
     
-    // Add prompt as "Final prompt" in bold
     if (data.prompt) {
       parts.push(`**Final prompt**: ${data.prompt}`);
     }
@@ -119,7 +103,6 @@ function formatCustomQuery(parsed: any): string {
     return result;
   } catch (error) {
     console.error('formatCustomQuery error:', error);
-    // If all else fails, return string representation
     return typeof parsed === 'string' ? parsed : JSON.stringify(parsed);
   }
 }
@@ -143,28 +126,23 @@ export default function CustomQueryBox({
     try {
       const res = await parseQuery(text);
       
-      // Get the actual parsed data - could be in parsed, raw, or directly in res
       let result = res.parsed || res.raw || res || null;
       
-      // If result is a string that looks like JSON, parse it
       if (typeof result === 'string' && result.trim().startsWith('{')) {
         try {
           result = JSON.parse(result);
         } catch {
-          // Keep as string if parsing fails
         }
       }
       
       setParsed(result);
       
-      // Format the parsed result into human-readable prompt
       const formatted = formatCustomQuery(result);
-      console.log('Formatted prompt:', formatted); // Debug log
+      console.log('Formatted prompt:', formatted); 
       setFormattedPrompt(formatted);
       setIsEditing(false);
       setIsEditingPrompt(false);
 
-      // send formatted prompt text to parent (not JSON)
       if (onParsed) {
         onParsed(formatted);
       }
@@ -181,7 +159,6 @@ export default function CustomQueryBox({
 
   const handleSavePrompt = () => {
     setIsEditingPrompt(false);
-    // Send the edited prompt text to parent
     if (onParsed && formattedPrompt.trim()) {
       onParsed(formattedPrompt);
     }
@@ -192,7 +169,7 @@ export default function CustomQueryBox({
     setParsed(null);
     setFormattedPrompt("");
     if (onParsed) {
-      onParsed(null); // Clear parsed state in parent
+      onParsed(null); 
     }
   };
 
@@ -241,7 +218,6 @@ export default function CustomQueryBox({
         ) : null}
       </div>
 
-      {/* Buttons - Fixed at bottom */}
       <div className="pt-4 mt-4 border-t border-zinc-200 dark:border-zinc-800 flex-shrink-0 space-y-2">
         {isEditing ? (
           <Button

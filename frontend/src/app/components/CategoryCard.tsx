@@ -29,10 +29,8 @@ export default function CategoryCard({
 }) {
   const issuesAvailable: string[] = computeIssuesForCategory(id, catalog);
 
-  // Convert CategoryState to internal Row format
   const categoryStateToRows = (state: CategoryState): Row[] => {
     const rows: Row[] = [];
-    // CategoryState structure: { [issueName]: { rows: [{ problems: [subtypeNames], speed, notes }] } }
     Object.entries(state).forEach(([issueName, typeState]) => {
       typeState.rows.forEach((row) => {
         rows.push({
@@ -40,20 +38,18 @@ export default function CategoryCard({
           subtypes: row.problems || [],
           speed: row.speed || "",
           notes: row.notes || "",
-          openStep: 1, // Default to step 1
+          openStep: 1, 
         });
       });
     });
     return rows.length > 0 ? rows : [{ issue: "", subtypes: [], speed: "", notes: "", openStep: 1 }];
   };
 
-  // Convert internal Row format to CategoryState
   const rowsToCategoryState = (rows: Row[]): CategoryState => {
     const state: CategoryState = {};
     rows.forEach((row) => {
       if (!row.issue || row.subtypes.length === 0) return;
       
-      // Group by issue
       const issueKey = row.issue;
       if (!state[issueKey]) {
         state[issueKey] = { rows: [] };
@@ -70,26 +66,20 @@ export default function CategoryCard({
 
   const [rows, setRows] = useState<Row[]>(() => categoryStateToRows(value || {}));
   const [lastValue, setLastValue] = useState<string>(() => JSON.stringify(value || {}));
-  // Local state for inputs to prevent auto-save on every keystroke
   const [localInputs, setLocalInputs] = useState<{ [key: number]: { speed: string; notes: string } }>({});
-  // Ref to track if the change is internal (to prevent sync loop)
   const isInternalUpdate = useRef(false);
 
-  // Sync with external value changes (only when value actually changes)
-  // IMPORTANT: Preserve openStep values when syncing to avoid resetting step navigation
   useEffect(() => {
     if (isInternalUpdate.current) {
       isInternalUpdate.current = false;
-      return; // Skip sync if change was internal
+      return; 
     }
     
     const newValueStr = JSON.stringify(value || {});
     if (newValueStr !== lastValue) {
       setRows((currentRows) => {
         const newRows = categoryStateToRows(value || {});
-        // Preserve openStep from current rows by matching issue+subtypes
         const preservedRows = newRows.map((newRow) => {
-          // Try to find matching row in current rows to preserve openStep
           const matchingRow = currentRows.find(
             (r) => r.issue === newRow.issue && 
                    JSON.stringify(r.subtypes.sort()) === JSON.stringify(newRow.subtypes.sort()) &&
@@ -104,7 +94,6 @@ export default function CategoryCard({
         return preservedRows;
       });
       setLastValue(newValueStr);
-      // Clear local inputs when external value changes
       setLocalInputs({});
     }
   }, [value, lastValue]);
@@ -119,12 +108,11 @@ export default function CategoryCard({
     const next = [...rows];
     const oldIssue = next[i].issue;
     next[i] = { ...next[i], ...patch };
-    // whenever issue changes → reset subtypes and speed/notes
     if (patch.issue && patch.issue !== oldIssue && oldIssue) {
       next[i].subtypes = [];
       next[i].speed = "";
       next[i].notes = "";
-      next[i].openStep = 2; // Go to step 2 when issue changes
+      next[i].openStep = 2; 
     }
     updateRows(next);
   };
@@ -184,7 +172,6 @@ export default function CategoryCard({
     return "pending";
   };
 
-  // Display name mapping for better UI
   const getDisplayName = (categoryId: string) => {
     if (categoryId === "Traffic Calming Measures") return "Traffic Calming";
     return categoryId;
@@ -212,7 +199,6 @@ export default function CategoryCard({
             key={i}
             className="border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 bg-gradient-to-br from-zinc-50 to-white dark:from-zinc-900 dark:to-zinc-800 space-y-4 shadow-sm"
           >
-            {/* Header */}
             <div className="flex justify-between items-center pb-3 border-b border-zinc-200 dark:border-zinc-800">
               <div className="flex items-center gap-3">
                 <div className="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 font-semibold text-sm">
@@ -234,7 +220,6 @@ export default function CategoryCard({
               )}
             </div>
 
-            {/* STEP 1 — ISSUE */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -295,7 +280,6 @@ export default function CategoryCard({
               )}
             </div>
 
-            {/* STEP 2 — SUBTYPES */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -351,7 +335,6 @@ export default function CategoryCard({
                         <div className="flex justify-end pt-2">
                           <Button
                             onClick={() => {
-                              // Directly update the row's openStep to 3
                               updateField(i, { openStep: 3 });
                             }}
                             size="sm"
@@ -399,7 +382,6 @@ export default function CategoryCard({
               )}
             </div>
 
-            {/* STEP 3 — SPEED & NOTES */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -524,7 +506,6 @@ export default function CategoryCard({
               )}
             </div>
 
-            {/* STEP 4 — PREVIEW */}
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 {step4Status === "complete" ? (
@@ -571,7 +552,6 @@ export default function CategoryCard({
 
       </div>
       
-      {/* Add Another Issue - Fixed at bottom */}
       <div className="pt-4 mt-4 border-t border-zinc-200 dark:border-zinc-800 flex-shrink-0">
         <Button
           onClick={addRow}

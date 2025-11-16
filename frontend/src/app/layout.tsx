@@ -1,4 +1,3 @@
-// frontend/src/app/layout.tsx
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import React from "react";

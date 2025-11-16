@@ -1449,3 +1449,136 @@ Import traces:
 [01:31:45.248] Server  LOG      ✓ Compiled in 35ms
 [01:32:01.281] Server  LOG      ✓ Compiled in 44ms
 [01:55:12.345] Server  LOG      ✓ Compiled in 50ms
+[02:15:03.083] Server  LOG      ✓ Compiled in 85ms
+[02:15:04.705] Server  LOG      ✓ Compiled in 59ms
+[02:15:06.498] Server  LOG      ✓ Compiled in 26ms
+[02:15:08.886] Server  LOG      ✓ Compiled in 32ms
+[02:15:13.884] Server  LOG      ✓ Compiled in 24ms
+[02:15:15.720] Server  LOG      ✓ Compiled in 30ms
+[02:15:17.468] Server  LOG      ✓ Compiled in 43ms
+[02:15:20.703] Server  LOG      ✓ Compiled in 23ms
+[02:15:22.500] Server  LOG      ✓ Compiled in 14ms
+[02:15:25.066] Server  LOG      ✓ Compiled in 42ms
+[02:15:26.709] Server  LOG      ✓ Compiled in 30ms
+[02:15:29.129] Server  LOG      ✓ Compiled in 39ms
+[02:15:32.440] Server  LOG      ✓ Compiled in 35ms
+[02:15:34.189] Server  LOG      ✓ Compiled in 19ms
+[02:15:37.469] Server  LOG      ✓ Compiled in 46ms
+[02:15:39.243] Server  LOG      ✓ Compiled in 16ms
+[02:15:40.777] Server  LOG      ✓ Compiled in 25ms
+[02:15:44.195] Server  LOG      ✓ Compiled in 21ms
+[02:15:46.827] Server  LOG      ✓ Compiled in 48ms
+[02:15:48.590] Server  LOG      ✓ Compiled in 53ms
+[02:15:52.104] Server  LOG      ✓ Compiled in 27ms
+[02:15:54.826] Server  LOG      ✓ Compiled in 18ms
+[02:15:56.722] Server  LOG      ✓ Compiled in 518ms
+[02:15:58.843] Server  LOG      ✓ Compiled in 44ms
+[02:16:00.731] Server  LOG      ✓ Compiled in 38ms
+[02:16:03.753] Server  LOG      ✓ Compiled in 41ms
+[02:16:06.147] Server  LOG      ✓ Compiled in 47ms
+[02:16:07.765] Server  LOG      ✓ Compiled in 49ms
+[02:16:09.683] Server  LOG      ✓ Compiled in 19ms
+[02:16:12.405] Server  LOG      ✓ Compiled in 40ms
+[02:16:14.120] Server  LOG      ✓ Compiled in 20ms
+[02:16:15.782] Server  LOG      ✓ Compiled in 50ms
+[02:16:20.265] Server  LOG      ✓ Compiled in 37ms
+[02:16:50.056] Server  LOG      ✓ Compiled in 26ms
+[02:16:54.307] Server  LOG      ✓ Compiled in 42ms
+[02:16:57.362] Server  LOG      ✓ Compiled in 17ms
+[02:17:10.632] Server  LOG      ✓ Compiled in 25ms
+[02:17:21.961] Server  LOG      ✓ Compiled in 74ms
+[02:17:30.354] Server  LOG      ✓ Compiled in 17ms
+[02:17:52.095] Server  LOG      ✓ Compiled in 20ms
+[02:17:55.638] Server  LOG      ✓ Compiled in 26ms
+[02:17:58.277] Server  LOG      ✓ Compiled in 13ms
+[02:18:09.594] Server  LOG      ✓ Compiled in 268ms
+[02:18:12.087] Server  LOG      ✓ Compiled in 132ms
+[02:18:14.704] Server  LOG      ✓ Compiled in 237ms
+[02:18:17.008] Server  LOG      ✓ Compiled in 212ms
+[02:18:19.102] Server  LOG      ✓ Compiled in 215ms
+[02:18:29.323] Server  LOG      ✓ Compiled in 197ms
+[02:18:30.738] Server  LOG      ✓ Compiled in 180ms
+[02:18:32.651] Server  LOG      ✓ Compiled in 85ms
+[02:18:34.894] Server  LOG      ✓ Compiled in 159ms
+[02:18:37.345] Server  LOG      ✓ Compiled in 184ms
+[02:18:38.843] Server  LOG      ✓ Compiled in 180ms
+[02:18:48.923] Server  LOG      ✓ Compiled in 95ms
+[02:18:52.742] Server  LOG      ✓ Compiled in 111ms
+[02:18:57.842] Server  LOG      ✓ Compiled in 196ms
+[02:19:02.320] Server  LOG      ✓ Compiled in 188ms
+[02:19:05.603] Server  LOG      ✓ Compiled in 180ms
+[02:19:08.643] Server  LOG      ✓ Compiled in 176ms
+[02:19:39.223] Server  LOG      ✓ Compiled in 358ms
+[02:19:43.593] Server  LOG      ✓ Compiled in 203ms
+[02:19:47.170] Server  LOG      ✓ Compiled in 181ms
+[02:19:54.318] Server  LOG      ✓ Compiled in 228ms
+[02:19:58.357] Server  LOG      ✓ Compiled in 181ms
+[02:20:06.151] Server  LOG      ✓ Compiled in 40ms
+[02:20:10.523] Server  LOG      ✓ Compiled in 37ms
+[02:20:12.667] Server  LOG      ✓ Compiled in 32ms
+[02:20:14.453] Server  LOG      ✓ Compiled in 36ms
+[02:20:16.105] Server  LOG      ✓ Compiled in 37ms
+[02:20:18.618] Server  LOG      ✓ Compiled in 32ms
+[02:20:26.205] Server  LOG      ✓ Compiled in 34ms
+[02:20:27.915] Server  LOG      ✓ Compiled in 31ms
+[02:20:29.271] Server  LOG      ✓ Compiled in 20ms
+[02:20:32.488] Server  LOG      ✓ Compiled in 21ms
+[02:20:34.231] Server  LOG      ✓ Compiled in 26ms
+[02:20:36.963] Server  LOG      ✓ Compiled in 30ms
+[02:20:38.436] Server  LOG      ✓ Compiled in 14ms
+[02:20:40.785] Server  LOG      ✓ Compiled in 32ms
+[02:20:43.118] Server  LOG      ✓ Compiled in 33ms
+[02:20:46.022] Server  LOG      ✓ Compiled in 19ms
+[02:20:46.632] Browser ERROR   ./frontend/src/app/page.tsx:104:26
+Parsing ecmascript source code failed
+  102 |       if (cat === "Custom Query") {
+  103 |         setSelectedCategories(["Custom Query"]);
+> 104 |         setAppState({}); /es
+      |                          ^^^
+  105 |       } else {
+  106 |         // If selecting any other category, deselect Custom Query
+  107 |         setSelectedCategories([...selectedCategories.filter(c => c !== "Custom Query"), cat]);
+
+Unterminated regexp literal
+
+Import traces:
+  Client Component Browser:
+    ./frontend/src/app/page.tsx [Client Component Browser]
+    ./frontend/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./frontend/src/app/page.tsx [Client Component SSR]
+    ./frontend/src/app/page.tsx [Server Component]
+[02:20:48.144] Server  LOG      ✓ Compiled in 18ms
+[02:20:49.849] Server  LOG      ✓ Compiled in 33ms
+[02:20:51.076] Server  LOG      ✓ Compiled in 32ms
+[02:20:54.227] Server  LOG      ✓ Compiled in 12ms
+[02:20:56.281] Server  LOG      ✓ Compiled in 51ms
+[02:21:00.349] Server  LOG      ✓ Compiled in 40ms
+[02:21:02.852] Server  LOG      ✓ Compiled in 36ms
+[02:21:04.414] Server  LOG      ✓ Compiled in 33ms
+[02:21:06.321] Server  LOG      ✓ Compiled in 25ms
+[02:21:07.726] Server  LOG      ✓ Compiled in 32ms
+[02:21:10.039] Server  LOG      ✓ Compiled in 35ms
+[02:21:15.039] Server  LOG      ✓ Compiled in 35ms
+[02:21:17.854] Server  LOG      ✓ Compiled in 24ms
+[02:21:23.263] Server  LOG      ✓ Compiled in 37ms
+[02:21:26.903] Server  LOG      ✓ Compiled in 96ms
+[02:21:29.625] Server  LOG      ✓ Compiled in 103ms
+[02:21:32.501] Server  LOG      ✓ Compiled in 67ms
+[02:21:34.336] Server  LOG      ✓ Compiled in 41ms
+[02:21:36.267] Server  LOG      ✓ Compiled in 49ms
+[02:21:39.914] Server  LOG      ✓ Compiled in 81ms
+[02:21:41.343] Server  LOG      ✓ Compiled in 80ms
+[02:21:43.359] Server  LOG      ✓ Compiled in 76ms
+[02:21:46.163] Server  LOG      ✓ Compiled in 80ms
+[02:21:48.420] Server  LOG      ✓ Compiled in 77ms
+[02:21:50.833] Server  LOG      ✓ Compiled in 92ms
+[02:21:52.923] Server  LOG      ✓ Compiled in 79ms
+[02:21:55.138] Server  LOG      ✓ Compiled in 95ms
+[02:21:57.255] Server  LOG      ✓ Compiled in 75ms
+[02:22:00.804] Server  LOG      ✓ Compiled in 92ms
+[02:22:03.463] Server  LOG      ✓ Compiled in 67ms
+[02:22:06.679] Server  LOG      ✓ Compiled in 91ms
+[02:22:09.108] Server  LOG      ✓ Compiled in 76ms
+[02:22:12.029] Server  LOG      ✓ Compiled in 80ms

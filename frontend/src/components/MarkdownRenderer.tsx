@@ -22,7 +22,6 @@ export default function MarkdownRenderer({ content }: { content: string }) {
             );
           },
           pre({ children, ...props }: any) {
-            // If the pre contains a code element, let the code component handle styling
             if (children && typeof children === 'object' && 'props' in children && children.props.className) {
               return <>{children}</>;
             }

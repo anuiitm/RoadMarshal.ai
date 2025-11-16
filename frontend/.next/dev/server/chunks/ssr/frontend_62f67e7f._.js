@@ -2,7 +2,6 @@ module.exports = [
 "[project]/frontend/src/app/layout.tsx [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-// frontend/src/app/layout.tsx
 __turbopack_context__.s([
     "default",
     ()=>RootLayout,
@@ -30,17 +29,17 @@ function RootLayout({ children }) {
                 children: children
             }, void 0, false, {
                 fileName: "[project]/frontend/src/app/layout.tsx",
-                lineNumber: 15,
+                lineNumber: 14,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/frontend/src/app/layout.tsx",
-            lineNumber: 14,
+            lineNumber: 13,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/frontend/src/app/layout.tsx",
-        lineNumber: 13,
+        lineNumber: 12,
         columnNumber: 5
     }, this);
 }

@@ -1,4 +1,3 @@
-// frontend/src/app/components/FinalPromptModal.tsx
 "use client";
 import React, { useState } from "react";
 

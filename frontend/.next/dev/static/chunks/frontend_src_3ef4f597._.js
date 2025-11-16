@@ -67,7 +67,6 @@ __turbopack_context__.s([
 ]);
 function generateHumanPrompt(state, customParsedPrompt) {
     if (!state || Object.keys(state).length === 0) {
-        // If only custom prompt exists, return it as is (already formatted)
         if (customParsedPrompt) {
             return customParsedPrompt;
         }
@@ -95,13 +94,10 @@ function generateHumanPrompt(state, customParsedPrompt) {
                 }
             }
         }
-        // Add newline after each category is done
         parts.push("\n");
     }
     if (customParsedPrompt) {
         parts.push("**Custom Query:**");
-        // customParsedPrompt is already formatted with all fields including Final prompt
-        // Split by newlines and indent each line
         const customLines = customParsedPrompt.split('\n');
         customLines.forEach((line)=>{
             parts.push(`    ${line}`);
@@ -415,7 +411,6 @@ __turbopack_context__.s([
 function computeIssuesForCategory(category, catalog) {
     if (!catalog || !catalog[category]) return [];
     const allIssues = new Set();
-    // category → each subtype → problems[]
     Object.values(catalog[category]).forEach((sub)=>{
         if (sub.problems && Array.isArray(sub.problems)) {
             sub.problems.forEach((p)=>allIssues.add(p));
@@ -482,11 +477,11 @@ var _s = __turbopack_context__.k.signature();
 function CategoryCard(t0) {
     _s();
     const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(28);
-    if ($[0] !== "fb34b637f541f7642043d292f18bfd72f2c4f3644a98d0db03712ce4be6b5279") {
+    if ($[0] !== "ec14c767a10589634a73053387ab9d26f839ab5ab25083af2437cefe895e7a28") {
         for(let $i = 0; $i < 28; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "fb34b637f541f7642043d292f18bfd72f2c4f3644a98d0db03712ce4be6b5279";
+        $[0] = "ec14c767a10589634a73053387ab9d26f839ab5ab25083af2437cefe895e7a28";
     }
     const { id, catalog, value, onChange } = t0;
     const issuesAvailable = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$lib$2f$computeIssues$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["computeIssuesForCategory"])(id, catalog);
@@ -1808,7 +1803,6 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
-// Format text with bold markdown
 function formatPromptText(text) {
     const parts = [];
     const lines = text.split('\n');
@@ -1819,26 +1813,22 @@ function formatPromptText(text) {
         let match;
         const lineParts = [];
         while((match = boldRegex.exec(line)) !== null){
-            // Add text before the match
             if (match.index > lastIndex) {
                 lineParts.push(line.substring(lastIndex, match.index));
             }
-            // Add bold text
             lineParts.push(/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
                 className: "font-bold text-zinc-900 dark:text-zinc-100",
                 children: match[1]
             }, `bold-${key++}`, false, {
                 fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                lineNumber: 26,
+                lineNumber: 22,
                 columnNumber: 22
             }, this));
             lastIndex = match.index + match[0].length;
         }
-        // Add remaining text
         if (lastIndex < line.length) {
             lineParts.push(line.substring(lastIndex));
         }
-        // If no matches, use the line as is
         if (lineParts.length === 0) {
             lineParts.push(line);
         }
@@ -1846,48 +1836,38 @@ function formatPromptText(text) {
             children: lineParts
         }, `line-${idx}`, false, {
             fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-            lineNumber: 41,
+            lineNumber: 33,
             columnNumber: 16
         }, this));
-        // Add newline except for last line
         if (idx < lines.length - 1) {
             parts.push('\n');
         }
     });
     return parts;
 }
-// Helper function to format parsed query in human-readable format
 function formatCustomQuery(parsed) {
     if (!parsed) return "";
-    console.log('formatCustomQuery input:', parsed, typeof parsed); // Debug log
+    console.log('formatCustomQuery input:', parsed, typeof parsed);
     try {
-        // If it's already a string, try to parse it as JSON
         let data = parsed;
         if (typeof parsed === 'string') {
-            // Remove markdown code block markers if present (```json ... ```)
             let cleaned = parsed.trim();
             if (cleaned.startsWith('```')) {
-                // Remove opening ```json or ```
                 cleaned = cleaned.replace(/^```(?:json)?\s*\n?/i, '');
-                // Remove closing ```
                 cleaned = cleaned.replace(/\n?```\s*$/g, '');
                 cleaned = cleaned.trim();
             }
             try {
-                // Parse the cleaned JSON string
                 data = JSON.parse(cleaned);
             } catch (parseError) {
                 console.error('JSON parse error:', parseError, 'Cleaned string:', cleaned);
-                // If it's not valid JSON, return as is
                 return parsed;
             }
         }
-        // If data is not an object, return string representation
         if (typeof data !== 'object' || data === null) {
             return String(data);
         }
         const parts = [];
-        // Handle categories array
         if (data.categories && Array.isArray(data.categories)) {
             data.categories.forEach((cat)=>{
                 if (cat && typeof cat === 'object') {
@@ -1901,7 +1881,6 @@ function formatCustomQuery(parsed) {
                 }
             });
         }
-        // Add prompt as "Final prompt" in bold
         if (data.prompt) {
             parts.push(`**Final prompt**: ${data.prompt}`);
         }
@@ -1910,7 +1889,6 @@ function formatCustomQuery(parsed) {
         return result;
     } catch (error) {
         console.error('formatCustomQuery error:', error);
-        // If all else fails, return string representation
         return typeof parsed === 'string' ? parsed : JSON.stringify(parsed);
     }
 }
@@ -1927,24 +1905,18 @@ function CustomQueryBox({ onParsed }) {
         setLoading(true);
         try {
             const res = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$api$2f$backend$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["parseQuery"])(text);
-            // Get the actual parsed data - could be in parsed, raw, or directly in res
             let result = res.parsed || res.raw || res || null;
-            // If result is a string that looks like JSON, parse it
             if (typeof result === 'string' && result.trim().startsWith('{')) {
                 try {
                     result = JSON.parse(result);
-                } catch  {
-                // Keep as string if parsing fails
-                }
+                } catch  {}
             }
             setParsed(result);
-            // Format the parsed result into human-readable prompt
             const formatted = formatCustomQuery(result);
-            console.log('Formatted prompt:', formatted); // Debug log
+            console.log('Formatted prompt:', formatted);
             setFormattedPrompt(formatted);
             setIsEditing(false);
             setIsEditingPrompt(false);
-            // send formatted prompt text to parent (not JSON)
             if (onParsed) {
                 onParsed(formatted);
             }
@@ -1959,7 +1931,6 @@ function CustomQueryBox({ onParsed }) {
     };
     const handleSavePrompt = ()=>{
         setIsEditingPrompt(false);
-        // Send the edited prompt text to parent
         if (onParsed && formattedPrompt.trim()) {
             onParsed(formattedPrompt);
         }
@@ -1969,7 +1940,7 @@ function CustomQueryBox({ onParsed }) {
         setParsed(null);
         setFormattedPrompt("");
         if (onParsed) {
-            onParsed(null); // Clear parsed state in parent
+            onParsed(null);
         }
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1983,7 +1954,7 @@ function CustomQueryBox({ onParsed }) {
                         children: "Custom Query"
                     }, void 0, false, {
                         fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                        lineNumber: 182,
+                        lineNumber: 145,
                         columnNumber: 9
                     }, this),
                     parsed && !isEditing && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -1996,20 +1967,20 @@ function CustomQueryBox({ onParsed }) {
                                 className: "w-3.5 h-3.5 mr-1"
                             }, void 0, false, {
                                 fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                                lineNumber: 184,
+                                lineNumber: 147,
                                 columnNumber: 13
                             }, this),
                             "Edit Query"
                         ]
                     }, void 0, true, {
                         fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                        lineNumber: 183,
+                        lineNumber: 146,
                         columnNumber: 34
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                lineNumber: 181,
+                lineNumber: 144,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2021,7 +1992,7 @@ function CustomQueryBox({ onParsed }) {
                     className: "w-full min-h-[200px] bg-transparent"
                 }, void 0, false, {
                     fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                    lineNumber: 190,
+                    lineNumber: 153,
                     columnNumber: 22
                 }, this) : parsed ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "space-y-3",
@@ -2032,7 +2003,7 @@ function CustomQueryBox({ onParsed }) {
                         className: "w-full min-h-[200px] bg-transparent"
                     }, void 0, false, {
                         fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                        lineNumber: 191,
+                        lineNumber: 154,
                         columnNumber: 32
                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "p-3 bg-zinc-50 dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700",
@@ -2041,22 +2012,22 @@ function CustomQueryBox({ onParsed }) {
                             children: formatPromptText(formattedPrompt || formatCustomQuery(parsed))
                         }, void 0, false, {
                             fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                            lineNumber: 192,
+                            lineNumber: 155,
                             columnNumber: 17
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                        lineNumber: 191,
+                        lineNumber: 154,
                         columnNumber: 243
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                    lineNumber: 190,
+                    lineNumber: 153,
                     columnNumber: 192
                 }, this) : null
             }, void 0, false, {
                 fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                lineNumber: 189,
+                lineNumber: 152,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2070,7 +2041,7 @@ function CustomQueryBox({ onParsed }) {
                     children: loading ? "Parsing…" : "Analyze & Parse"
                 }, void 0, false, {
                     fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                    lineNumber: 201,
+                    lineNumber: 163,
                     columnNumber: 22
                 }, this) : parsed && formattedPrompt ? isEditingPrompt ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
                     onClick: handleSavePrompt,
@@ -2080,7 +2051,7 @@ function CustomQueryBox({ onParsed }) {
                     children: "Save Prompt"
                 }, void 0, false, {
                     fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                    lineNumber: 203,
+                    lineNumber: 165,
                     columnNumber: 69
                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
                     onClick: handleEditPrompt,
@@ -2092,25 +2063,25 @@ function CustomQueryBox({ onParsed }) {
                             className: "w-3.5 h-3.5 mr-1"
                         }, void 0, false, {
                             fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                            lineNumber: 206,
+                            lineNumber: 168,
                             columnNumber: 15
                         }, this),
                         "Edit Prompt"
                     ]
                 }, void 0, true, {
                     fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                    lineNumber: 205,
+                    lineNumber: 167,
                     columnNumber: 25
                 }, this) : null
             }, void 0, false, {
                 fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-                lineNumber: 200,
+                lineNumber: 162,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/frontend/src/app/components/CustomQueryBox.tsx",
-        lineNumber: 180,
+        lineNumber: 143,
         columnNumber: 10
     }, this);
 }
@@ -2135,11 +2106,11 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$
 ;
 function LoadingView(t0) {
     const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(4);
-    if ($[0] !== "4ff2f21b75b3bbf2010383d2ecf0072e956810f5d3f13d3c739accc7925f1041") {
+    if ($[0] !== "6e8f77eca59554d03c4032e63d1b69b1b2f990c443012b53cdde8e634d619f8c") {
         for(let $i = 0; $i < 4; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "4ff2f21b75b3bbf2010383d2ecf0072e956810f5d3f13d3c739accc7925f1041";
+        $[0] = "6e8f77eca59554d03c4032e63d1b69b1b2f990c443012b53cdde8e634d619f8c";
     }
     const { message: t1 } = t0;
     const message = t1 === undefined ? "Please wait - I'm onto it." : t1;
@@ -2149,7 +2120,7 @@ function LoadingView(t0) {
             className: "animate-spin h-16 w-16 border-4 border-t-emerald-600 border-zinc-200 dark:border-zinc-700 rounded-full"
         }, void 0, false, {
             fileName: "[project]/frontend/src/app/components/LoadingView.tsx",
-            lineNumber: 17,
+            lineNumber: 16,
             columnNumber: 10
         }, this);
         $[1] = t2;
@@ -2171,23 +2142,23 @@ function LoadingView(t0) {
                             children: message
                         }, void 0, false, {
                             fileName: "[project]/frontend/src/app/components/LoadingView.tsx",
-                            lineNumber: 24,
+                            lineNumber: 23,
                             columnNumber: 175
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/frontend/src/app/components/LoadingView.tsx",
-                        lineNumber: 24,
+                        lineNumber: 23,
                         columnNumber: 146
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/frontend/src/app/components/LoadingView.tsx",
-                lineNumber: 24,
+                lineNumber: 23,
                 columnNumber: 73
             }, this)
         }, void 0, false, {
             fileName: "[project]/frontend/src/app/components/LoadingView.tsx",
-            lineNumber: 24,
+            lineNumber: 23,
             columnNumber: 10
         }, this);
         $[2] = message;
@@ -2221,11 +2192,11 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$
 ;
 function MarkdownRenderer(t0) {
     const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(5);
-    if ($[0] !== "4232eb4d78abd2c9a3521de34940aba65db4e722f24e1bac1e990541c53c666c") {
+    if ($[0] !== "2a3d2add7653df74aff836521e9034a1ceff226ddd052e978d6ffbfcf8025f39") {
         for(let $i = 0; $i < 5; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "4232eb4d78abd2c9a3521de34940aba65db4e722f24e1bac1e990541c53c666c";
+        $[0] = "2a3d2add7653df74aff836521e9034a1ceff226ddd052e978d6ffbfcf8025f39";
     }
     const { content } = t0;
     let t1;
@@ -2322,7 +2293,6 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 "[project]/frontend/src/app/components/ResultView.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-// frontend/src/app/components/ResultView.tsx
 __turbopack_context__.s([
     "default",
     ()=>ResultView
@@ -2347,39 +2317,31 @@ function ResultView({ result, onRestart }) {
                 useCORS: true,
                 logging: false,
                 scale: 2,
-                // <-- RE-ENABLED for sharp text
                 onclone: (clonedDoc)=>{
                     const clonedRoot = clonedDoc.getElementById("result-root");
                     if (!clonedRoot) return;
-                    // 1. Nuke stylesheets
                     clonedDoc.querySelectorAll('style, link[rel="stylesheet"]').forEach((styleEl)=>{
                         styleEl.remove();
                     });
-                    // 2. Force width on root
                     clonedRoot.style.width = "800px";
                     clonedRoot.style.boxSizing = "border-box";
                     clonedRoot.style.fontFamily = "Arial, sans-serif"; // Base font
-                    // 3. Walk all child elements
                     const walker = clonedDoc.createTreeWalker(clonedRoot, NodeFilter.SHOW_ELEMENT);
                     let node;
                     while(node = walker.nextNode()){
                         const elem = node;
                         const tagName = elem.tagName.toLowerCase();
-                        // Wipe all styling attributes
                         elem.removeAttribute("class");
                         elem.removeAttribute("data-theme");
                         elem.removeAttribute("style");
-                        // Apply universal safe styles
                         elem.style.color = "#000000";
-                        elem.style.backgroundColor = "transparent"; // Let root bg show
+                        elem.style.backgroundColor = "transparent";
                         elem.style.border = "none";
                         elem.style.textDecoration = "none";
                         elem.style.boxShadow = "none";
                         elem.style.overflow = "visible";
                         elem.style.whiteSpace = "normal";
                         elem.style.wordWrap = "break-word";
-                        // === FIX FOR TEXT CLIPPING & QUALITY ===
-                        // Apply font styles and padding *only* to elements that typically hold text.
                         if ([
                             'p',
                             'li',
@@ -2393,11 +2355,9 @@ function ResultView({ result, onRestart }) {
                             elem.style.fontFamily = "Arial, sans-serif";
                             elem.style.fontSize = "16px";
                             elem.style.lineHeight = "1.5";
-                            // THIS IS THE FIX: Add vertical padding for "breathing room"
                             elem.style.paddingTop = "2px";
                             elem.style.paddingBottom = "2px";
                         }
-                        // Add back basic semantic styling
                         if ([
                             'h1',
                             'h2',
@@ -2409,17 +2369,15 @@ function ResultView({ result, onRestart }) {
                         }
                         if (tagName === 'h1') elem.style.fontSize = "24px";
                         if (tagName === 'h2') elem.style.fontSize = "20px";
-                        // Fix list rendering
                         if (tagName === 'ul' || tagName === 'ol') {
-                            elem.style.paddingLeft = "40px"; // Indent list
+                            elem.style.paddingLeft = "40px";
                             elem.style.margin = "10px 0";
                         }
                         if (tagName === 'li') {
-                            elem.style.listStylePosition = "outside"; // Show bullets
+                            elem.style.listStylePosition = "outside";
                             elem.style.display = "list-item";
                         }
                     }
-                    // 4. Style the root element itself
                     clonedRoot.style.backgroundColor = "#ffffff";
                     clonedRoot.style.color = "#000000";
                     clonedRoot.style.padding = "40px";
@@ -2438,7 +2396,6 @@ function ResultView({ result, onRestart }) {
             const usableHeight = imgProps.height * usableWidth / imgProps.width;
             const pageHeightWithMargin = pdfPageHeight - margin * 2;
             if (usableHeight > pageHeightWithMargin) {
-                // --- Multi-page logic (REVISED) ---
                 let heightLeft = usableHeight;
                 let position = margin;
                 pdf.addImage(img, 'PNG', margin, position, usableWidth, usableHeight);
@@ -2446,13 +2403,12 @@ function ResultView({ result, onRestart }) {
                 let page = 1;
                 while(heightLeft > 0){
                     pdf.addPage();
-                    position = margin - pageHeightWithMargin * page; // Corrected position
+                    position = margin - pageHeightWithMargin * page;
                     pdf.addImage(img, 'PNG', margin, position, usableWidth, usableHeight);
                     heightLeft -= pageHeightWithMargin;
                     page++;
                 }
             } else {
-                // --- Single-page logic ---
                 pdf.addImage(img, "PNG", margin, margin, usableWidth, usableHeight);
             }
             pdf.save("roadmarshal-report.pdf");
@@ -2461,8 +2417,7 @@ function ResultView({ result, onRestart }) {
             alert("Failed to generate PDF. Please try again.");
         }
     };
-    return(// ... (Your JSX remains the same)
-    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "space-y-4",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2472,12 +2427,12 @@ function ResultView({ result, onRestart }) {
                     content: answer
                 }, void 0, false, {
                     fileName: "[project]/frontend/src/app/components/ResultView.tsx",
-                    lineNumber: 138,
+                    lineNumber: 112,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/frontend/src/app/components/ResultView.tsx",
-                lineNumber: 137,
+                lineNumber: 111,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2489,7 +2444,7 @@ function ResultView({ result, onRestart }) {
                         children: "Download PDF"
                     }, void 0, false, {
                         fileName: "[project]/frontend/src/app/components/ResultView.tsx",
-                        lineNumber: 142,
+                        lineNumber: 116,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2498,21 +2453,21 @@ function ResultView({ result, onRestart }) {
                         children: "Restart"
                     }, void 0, false, {
                         fileName: "[project]/frontend/src/app/components/ResultView.tsx",
-                        lineNumber: 143,
+                        lineNumber: 117,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/frontend/src/app/components/ResultView.tsx",
-                lineNumber: 141,
+                lineNumber: 115,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/frontend/src/app/components/ResultView.tsx",
-        lineNumber: 136,
-        columnNumber: 5
-    }, this));
+        lineNumber: 110,
+        columnNumber: 10
+    }, this);
 }
 _c = ResultView;
 var _c;
@@ -2524,7 +2479,6 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 "[project]/frontend/src/app/components/Navbar.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-// frontend/src/app/components/Navbar.tsx
 __turbopack_context__.s([
     "default",
     ()=>Navbar
@@ -2545,11 +2499,11 @@ var _s = __turbopack_context__.k.signature();
 function Navbar() {
     _s();
     const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(10);
-    if ($[0] !== "972114aaa1d49eacbd31f2982de1b104d03bcdec761051aacf5a71b77f3540f0") {
+    if ($[0] !== "938c6f4f0a663ad9af710ef40721a93f7e811e5dbde1e1139492a0c84c65f6e5") {
         for(let $i = 0; $i < 10; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "972114aaa1d49eacbd31f2982de1b104d03bcdec761051aacf5a71b77f3540f0";
+        $[0] = "938c6f4f0a663ad9af710ef40721a93f7e811e5dbde1e1139492a0c84c65f6e5";
     }
     const { theme, setTheme } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2d$themes$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useTheme"])();
     let t0;
@@ -2562,7 +2516,7 @@ function Navbar() {
                     className: "h-8 w-8 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-md"
                 }, void 0, false, {
                     fileName: "[project]/frontend/src/app/components/Navbar.tsx",
-                    lineNumber: 22,
+                    lineNumber: 21,
                     columnNumber: 61
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2570,13 +2524,13 @@ function Navbar() {
                     children: "RoadMarshal.AI"
                 }, void 0, false, {
                     fileName: "[project]/frontend/src/app/components/Navbar.tsx",
-                    lineNumber: 22,
+                    lineNumber: 21,
                     columnNumber: 143
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/frontend/src/app/components/Navbar.tsx",
-            lineNumber: 22,
+            lineNumber: 21,
             columnNumber: 10
         }, this);
         $[1] = t0;
@@ -2600,13 +2554,13 @@ function Navbar() {
             className: "w-5 h-5"
         }, void 0, false, {
             fileName: "[project]/frontend/src/app/components/Navbar.tsx",
-            lineNumber: 40,
+            lineNumber: 39,
             columnNumber: 29
         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$moon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Moon$3e$__["Moon"], {
             className: "w-5 h-5"
         }, void 0, false, {
             fileName: "[project]/frontend/src/app/components/Navbar.tsx",
-            lineNumber: 40,
+            lineNumber: 39,
             columnNumber: 59
         }, this);
         $[5] = theme;
@@ -2631,23 +2585,23 @@ function Navbar() {
                             children: t2
                         }, void 0, false, {
                             fileName: "[project]/frontend/src/app/components/Navbar.tsx",
-                            lineNumber: 48,
+                            lineNumber: 47,
                             columnNumber: 231
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/frontend/src/app/components/Navbar.tsx",
-                        lineNumber: 48,
+                        lineNumber: 47,
                         columnNumber: 190
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/frontend/src/app/components/Navbar.tsx",
-                lineNumber: 48,
+                lineNumber: 47,
                 columnNumber: 107
             }, this)
         }, void 0, false, {
             fileName: "[project]/frontend/src/app/components/Navbar.tsx",
-            lineNumber: 48,
+            lineNumber: 47,
             columnNumber: 10
         }, this);
         $[7] = t1;
@@ -2673,7 +2627,6 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 "[project]/frontend/src/app/components/FinalPromptModal.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-// frontend/src/app/components/FinalPromptModal.tsx
 __turbopack_context__.s([
     "default",
     ()=>FinalPromptModal
@@ -2689,11 +2642,11 @@ var _s = __turbopack_context__.k.signature();
 function FinalPromptModal(t0) {
     _s();
     const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(16);
-    if ($[0] !== "bbf24ae6c8748cb93011117b1521a3ab43bc3305287632a942aacf3e8b92ce9a") {
+    if ($[0] !== "32fd718d04ec2208584852869427b22931424819b2b32a40219ea08103d14eec") {
         for(let $i = 0; $i < 16; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "bbf24ae6c8748cb93011117b1521a3ab43bc3305287632a942aacf3e8b92ce9a";
+        $[0] = "32fd718d04ec2208584852869427b22931424819b2b32a40219ea08103d14eec";
     }
     const { initial, onConfirm, onClose } = t0;
     const [text, setText] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(initial);
@@ -2704,7 +2657,7 @@ function FinalPromptModal(t0) {
             children: "I would like to confirm the prompt. Please review it. Please make changes if needed."
         }, void 0, false, {
             fileName: "[project]/frontend/src/app/components/FinalPromptModal.tsx",
-            lineNumber: 22,
+            lineNumber: 21,
             columnNumber: 10
         }, this);
         $[1] = t1;
@@ -2728,7 +2681,7 @@ function FinalPromptModal(t0) {
             className: "w-full min-h-[160px] p-3 bg-transparent border rounded"
         }, void 0, false, {
             fileName: "[project]/frontend/src/app/components/FinalPromptModal.tsx",
-            lineNumber: 38,
+            lineNumber: 37,
             columnNumber: 10
         }, this);
         $[3] = text;
@@ -2744,7 +2697,7 @@ function FinalPromptModal(t0) {
             children: "Cancel"
         }, void 0, false, {
             fileName: "[project]/frontend/src/app/components/FinalPromptModal.tsx",
-            lineNumber: 46,
+            lineNumber: 45,
             columnNumber: 10
         }, this);
         $[5] = onClose;
@@ -2762,7 +2715,7 @@ function FinalPromptModal(t0) {
             children: "Confirm & Run"
         }, void 0, false, {
             fileName: "[project]/frontend/src/app/components/FinalPromptModal.tsx",
-            lineNumber: 54,
+            lineNumber: 53,
             columnNumber: 10
         }, this);
         $[7] = onConfirm;
@@ -2781,7 +2734,7 @@ function FinalPromptModal(t0) {
             ]
         }, void 0, true, {
             fileName: "[project]/frontend/src/app/components/FinalPromptModal.tsx",
-            lineNumber: 65,
+            lineNumber: 64,
             columnNumber: 10
         }, this);
         $[10] = t4;
@@ -2803,12 +2756,12 @@ function FinalPromptModal(t0) {
                 ]
             }, void 0, true, {
                 fileName: "[project]/frontend/src/app/components/FinalPromptModal.tsx",
-                lineNumber: 74,
+                lineNumber: 73,
                 columnNumber: 91
             }, this)
         }, void 0, false, {
             fileName: "[project]/frontend/src/app/components/FinalPromptModal.tsx",
-            lineNumber: 74,
+            lineNumber: 73,
             columnNumber: 10
         }, this);
         $[13] = t3;
@@ -2836,13 +2789,10 @@ __turbopack_context__.s([
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/frontend/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/frontend/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
-// Import your API functions
 var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$api$2f$backend$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/frontend/src/app/api/backend.ts [app-client] (ecmascript)");
-// Import your state and prompt logic
 var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$utils$2f$prompt$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/frontend/src/app/utils/prompt.ts [app-client] (ecmascript)");
-// Import all your UI components
-var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$components$2f$Chip$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/frontend/src/components/Chip.tsx [app-client] (ecmascript)"); // Uses the one in src/components/
-var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$components$2f$CategoryCard$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/frontend/src/app/components/CategoryCard.tsx [app-client] (ecmascript)"); // Uses the one in src/app/components/
+var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$components$2f$Chip$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/frontend/src/components/Chip.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$components$2f$CategoryCard$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/frontend/src/app/components/CategoryCard.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$components$2f$CustomQueryBox$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/frontend/src/app/components/CustomQueryBox.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$components$2f$LoadingView$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/frontend/src/app/components/LoadingView.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$components$2f$ResultView$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/frontend/src/app/components/ResultView.tsx [app-client] (ecmascript)");
@@ -2865,7 +2815,6 @@ function QueryPage() {
     _s();
     const [catalog, setCatalog] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [loadingCatalog, setLoadingCatalog] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
-    // --- State Management ---
     const [appState, setAppState] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({});
     const [customParsedPrompt, setCustomParsedPrompt] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [selectedCategories, setSelectedCategories] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
@@ -2875,43 +2824,36 @@ function QueryPage() {
         "Traffic Calming Measures",
         "Custom Query"
     ];
-    // Display name mapping for better UI
     const getCategoryDisplayName = (category)=>{
         if (category === "Traffic Calming Measures") return "Traffic Calming";
         return category;
     };
-    // Format preview text to render bold markdown
     const formatPreviewText = (text)=>{
         const parts = [];
         const lines = text.split('\n');
         let key = 0;
         lines.forEach((line, idx)=>{
-            // Check for bold markdown **text**
             const boldRegex = /\*\*(.+?)\*\*/g;
             let lastIndex = 0;
             let match;
             const lineParts = [];
             while((match = boldRegex.exec(line)) !== null){
-                // Add text before the match
                 if (match.index > lastIndex) {
                     lineParts.push(line.substring(lastIndex, match.index));
                 }
-                // Add bold text
                 lineParts.push(/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
                     className: "font-bold text-zinc-900 dark:text-zinc-100",
                     children: match[1]
                 }, `bold-${key++}`, false, {
                     fileName: "[project]/frontend/src/app/page.tsx",
-                    lineNumber: 52,
+                    lineNumber: 37,
                     columnNumber: 24
                 }, this));
                 lastIndex = match.index + match[0].length;
             }
-            // Add remaining text
             if (lastIndex < line.length) {
                 lineParts.push(line.substring(lastIndex));
             }
-            // If no matches, use the line as is
             if (lineParts.length === 0) {
                 lineParts.push(line);
             }
@@ -2919,21 +2861,18 @@ function QueryPage() {
                 children: lineParts
             }, `line-${idx}`, false, {
                 fileName: "[project]/frontend/src/app/page.tsx",
-                lineNumber: 67,
+                lineNumber: 48,
                 columnNumber: 18
             }, this));
-            // Add newline except for last line
             if (idx < lines.length - 1) {
                 parts.push('\n');
             }
         });
         return parts;
     };
-    // --- AI Interaction State ---
     const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [result, setResult] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [showPromptModal, setShowPromptModal] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
-    // 1. Load catalog on mount
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "QueryPage.useEffect": ()=>{
             (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$api$2f$backend$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fetchCatalog"])().then({
@@ -2947,11 +2886,8 @@ function QueryPage() {
             }["QueryPage.useEffect"]);
         }
     }["QueryPage.useEffect"], []);
-    // 2. Toggle category visibility
-    // Custom Query is mutually exclusive with other categories
     const toggleCategory = (cat)=>{
         if (selectedCategories.includes(cat)) {
-            // Deselecting the category
             setSelectedCategories(selectedCategories.filter((c)=>c !== cat));
             if (cat !== "Custom Query") {
                 setAppState((prev)=>{
@@ -2965,40 +2901,33 @@ function QueryPage() {
                 setCustomParsedPrompt(null);
             }
         } else {
-            // Selecting a category
             if (cat === "Custom Query") {
-                // If selecting Custom Query, deselect all others
                 setSelectedCategories([
                     "Custom Query"
                 ]);
-                setAppState({}); // Clear all other category states
+                setAppState({});
             } else {
-                // If selecting any other category, deselect Custom Query
                 setSelectedCategories([
                     ...selectedCategories.filter((c_0)=>c_0 !== "Custom Query"),
                     cat
                 ]);
-                setCustomParsedPrompt(null); // Clear custom query
+                setCustomParsedPrompt(null);
             }
         }
     };
-    // 3. Handle updates from a CategoryCard
     const handleCategoryChange = (category_0, nextCategoryState)=>{
         setAppState((prev_0)=>({
                 ...prev_0,
                 [category_0]: nextCategoryState
             }));
     };
-    // 4. Handle updates from the CustomQueryBox
     const handleCustomQueryParsed = (parsed)=>{
-        // parsed is now the formatted prompt text (string)
         if (parsed && typeof parsed === 'string') {
             setCustomParsedPrompt(parsed);
         } else {
             setCustomParsedPrompt(null);
         }
     };
-    // 5. Reset everything
     const restartAll = ()=>{
         setAppState({});
         setCustomParsedPrompt(null);
@@ -3006,16 +2935,13 @@ function QueryPage() {
         setResult(null);
         setIsLoading(false);
     };
-    // 6. Show prompt preview
     const handleShowPrompt = ()=>{
         setShowPromptModal(true);
     };
-    // 7. Submit to AI (called from modal)
     const handleSubmit = async (confirmedPrompt)=>{
         setShowPromptModal(false);
         setIsLoading(true);
         setResult(null);
-        // Use the LLM prompt format for the API
         const finalPrompt = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$utils$2f$prompt$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["generateLLMPrompt"])(appState, customParsedPrompt);
         try {
             const res = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$api$2f$backend$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["sendQuery"])(finalPrompt);
@@ -3028,20 +2954,19 @@ function QueryPage() {
         }
         setIsLoading(false);
     };
-    // --- Render Logic ---
     if (loadingCatalog) {
         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$components$2f$Navbar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                     fileName: "[project]/frontend/src/app/page.tsx",
-                    lineNumber: 180,
+                    lineNumber: 132,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$components$2f$LoadingView$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                     message: "Loading catalog..."
                 }, void 0, false, {
                     fileName: "[project]/frontend/src/app/page.tsx",
-                    lineNumber: 181,
+                    lineNumber: 133,
                     columnNumber: 9
                 }, this)
             ]
@@ -3052,12 +2977,12 @@ function QueryPage() {
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$components$2f$Navbar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                     fileName: "[project]/frontend/src/app/page.tsx",
-                    lineNumber: 186,
+                    lineNumber: 138,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$components$2f$LoadingView$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                     fileName: "[project]/frontend/src/app/page.tsx",
-                    lineNumber: 187,
+                    lineNumber: 139,
                     columnNumber: 9
                 }, this)
             ]
@@ -3068,7 +2993,7 @@ function QueryPage() {
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$components$2f$Navbar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                     fileName: "[project]/frontend/src/app/page.tsx",
-                    lineNumber: 192,
+                    lineNumber: 144,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3078,12 +3003,12 @@ function QueryPage() {
                         onRestart: restartAll
                     }, void 0, false, {
                         fileName: "[project]/frontend/src/app/page.tsx",
-                        lineNumber: 194,
+                        lineNumber: 146,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/frontend/src/app/page.tsx",
-                    lineNumber: 193,
+                    lineNumber: 145,
                     columnNumber: 9
                 }, this)
             ]
@@ -3094,7 +3019,7 @@ function QueryPage() {
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$components$2f$Navbar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                 fileName: "[project]/frontend/src/app/page.tsx",
-                lineNumber: 200,
+                lineNumber: 152,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3108,7 +3033,7 @@ function QueryPage() {
                                 children: "Hi There !! I am RoadMarshal.AI"
                             }, void 0, false, {
                                 fileName: "[project]/frontend/src/app/page.tsx",
-                                lineNumber: 205,
+                                lineNumber: 157,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -3116,13 +3041,13 @@ function QueryPage() {
                                 children: "I am here to assist you with road safety interventions. Please Select your Query"
                             }, void 0, false, {
                                 fileName: "[project]/frontend/src/app/page.tsx",
-                                lineNumber: 206,
+                                lineNumber: 158,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/frontend/src/app/page.tsx",
-                        lineNumber: 204,
+                        lineNumber: 156,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3133,12 +3058,12 @@ function QueryPage() {
                                 onClick: ()=>toggleCategory(cat_1)
                             }, cat_1, false, {
                                 fileName: "[project]/frontend/src/app/page.tsx",
-                                lineNumber: 215,
+                                lineNumber: 166,
                                 columnNumber: 36
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/frontend/src/app/page.tsx",
-                        lineNumber: 214,
+                        lineNumber: 165,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3151,7 +3076,7 @@ function QueryPage() {
                                     onChange: (next_0)=>handleCategoryChange(cat_3, next_0)
                                 }, cat_3, false, {
                                     fileName: "[project]/frontend/src/app/page.tsx",
-                                    lineNumber: 221,
+                                    lineNumber: 172,
                                     columnNumber: 86
                                 }, this)),
                             selectedCategories.includes("Custom Query") && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3162,23 +3087,23 @@ function QueryPage() {
                                         onParsed: handleCustomQueryParsed
                                     }, void 0, false, {
                                         fileName: "[project]/frontend/src/app/page.tsx",
-                                        lineNumber: 225,
+                                        lineNumber: 176,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/frontend/src/app/page.tsx",
-                                    lineNumber: 224,
+                                    lineNumber: 175,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/frontend/src/app/page.tsx",
-                                lineNumber: 223,
+                                lineNumber: 174,
                                 columnNumber: 59
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/frontend/src/app/page.tsx",
-                        lineNumber: 219,
+                        lineNumber: 170,
                         columnNumber: 9
                     }, this),
                     canSubmit && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3192,7 +3117,7 @@ function QueryPage() {
                                         children: "Preview your query:"
                                     }, void 0, false, {
                                         fileName: "[project]/frontend/src/app/page.tsx",
-                                        lineNumber: 233,
+                                        lineNumber: 183,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3200,13 +3125,13 @@ function QueryPage() {
                                         children: formatPreviewText((0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$utils$2f$prompt$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["generateHumanPrompt"])(appState, customParsedPrompt) || "No query to preview")
                                     }, void 0, false, {
                                         fileName: "[project]/frontend/src/app/page.tsx",
-                                        lineNumber: 234,
+                                        lineNumber: 184,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/frontend/src/app/page.tsx",
-                                lineNumber: 232,
+                                lineNumber: 182,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3217,24 +3142,24 @@ function QueryPage() {
                                     children: "Review & Submit for Analysis"
                                 }, void 0, false, {
                                     fileName: "[project]/frontend/src/app/page.tsx",
-                                    lineNumber: 239,
+                                    lineNumber: 189,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/frontend/src/app/page.tsx",
-                                lineNumber: 238,
+                                lineNumber: 188,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/frontend/src/app/page.tsx",
-                        lineNumber: 231,
+                        lineNumber: 181,
                         columnNumber: 23
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/frontend/src/app/page.tsx",
-                lineNumber: 201,
+                lineNumber: 153,
                 columnNumber: 7
             }, this),
             showPromptModal && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2f$src$2f$app$2f$components$2f$FinalPromptModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -3243,7 +3168,7 @@ function QueryPage() {
                 onClose: ()=>setShowPromptModal(false)
             }, void 0, false, {
                 fileName: "[project]/frontend/src/app/page.tsx",
-                lineNumber: 251,
+                lineNumber: 200,
                 columnNumber: 27
             }, this)
         ]

@@ -1,4 +1,3 @@
-// frontend/src/app/components/LoadingView.tsx
 export default function LoadingView({ message = "Please wait - I'm onto it." }: { message?: string }) {
   return (
     <div className="min-h-screen flex items-center justify-center">
