@@ -113,11 +113,3 @@ This will start the Next.js development server, typically accessible at `http://
 3.  Provide additional details like speed and notes if prompted.
 4.  Submit your query to receive AI-generated road safety intervention recommendations.
 5.  Use the "Download PDF" button to save the report.
-
-## Contributing
-
-(Optional section: Add guidelines for contributing to the project if applicable.)
-
-## License
-
-(Optional section: Add license information.)
