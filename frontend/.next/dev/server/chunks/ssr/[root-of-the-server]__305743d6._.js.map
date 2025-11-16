@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 18, "column": 0}, "map": {"version":3,"sources":["file:///Users/anubhav/Desktop/Me/Projects/RoadMarshal_AI/frontend/src/app/page.tsx"],"sourcesContent":["import Link from \"next/link\";\n\nexport default function Home() {\n  return (\n    <main className=\"flex flex-col items-center justify-center min-h-screen p-10\">\n      <h1 className=\"text-4xl font-bold mb-6\">RoadMarshal AI</h1>\n      \n      <Link\n        href=\"/query-builder\"\n        className=\"bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700\"\n      >\n        Start Analysis\n      </Link>\n    </main>\n  );\n}\n"],"names":[],"mappings":";;;;;AAAA;;;AAEe,SAAS;IACtB,qBACE,8OAAC;QAAK,WAAU;;0BACd,8OAAC;gBAAG,WAAU;0BAA0B;;;;;;0BAExC,8OAAC,0LAAI;gBACH,MAAK;gBACL,WAAU;0BACX;;;;;;;;;;;;AAKP"}}]
-}
