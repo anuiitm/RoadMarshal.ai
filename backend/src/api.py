@@ -48,13 +48,13 @@ class ParseReq(BaseModel):
 
 @app.post("/parse")
 def parse_query(payload: ParseReq):
-    from .deepseek_client import call_deepseek
+    from .ai_client import call_gemini
     parse_prompt = f"""Parse the following user query into JSON with fields:
 {{"categories":[{{"category": "...", "type": "...", "problems": [...], "speed":"", "notes": ""}}], "prompt": "<a cleaned English prompt>"}}
 User Query: {payload.text}
 Output only valid JSON.
 """
-    resp = call_deepseek(parse_prompt)
+    resp = call_gemini(parse_prompt)
     try:
         parsed = json.loads(resp)
         return {"success": True, "parsed": parsed}

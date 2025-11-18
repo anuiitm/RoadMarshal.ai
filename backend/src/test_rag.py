@@ -1,7 +1,19 @@
 from src.rag_engine import rag_answer
 
-query = "STOP sign faded on 60 kmph road"
-resp = rag_answer(query)
+query = """
+A word message "DISABLED" marking is non-standard.
+A straight arrow marking is non-standard.
+A continuous center line marking has the wrong color.
+A ladder hatching marking has the wrong color.
+A single chevron (normal) sign is faded.
+A hospital sign is faded.
+A compulsory turn left sign is wrongly placed.
+Pedestrian crossing informatory signs are wrongly placed.
+A speed hump has a placement issue.
+A speed bump is non-standard.
+A speed hump is non-standard.
+"""
+resp = rag_answer(query, top_k=20) # Temporarily increasing top_k in the call if possible, or I'll rely on default and see what happens. Actually rag_engine default is 10.
 
 print("\n=== FINAL ANSWER ===\n")
 print(resp["answer"])

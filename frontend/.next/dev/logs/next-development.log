@@ -1,2 +1,162 @@
-[00:00:00.523] Server  LOG      ✓ Ready in 367ms
-[00:00:15.150] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:00.744] Server  LOG      ✓ Ready in 565ms
+[00:45:11.245] Browser ERROR   Parse error: {"code":"ERR_NETWORK","config":{"adapter":["xhr","http","fetch"],"allowAbsoluteUrls":true,"data":"{\"text\":\"A word message \\\"DISABLED\\\" marking is non-standard.\\nA straight arrow marking is non-standard.\\nA continuous center line marking has the wrong color.\\nA ladder hatching marking has the wrong color.\\nA single chevron (normal) sign is faded.\\nA hospital sign is faded.\\nA compulsory turn left sign is wrongly placed.\\nPedestrian crossing informatory signs are wrongly placed.\\nA speed hump has a placement issue.\\nA speed bump is non-standard.\\nA speed hump is non-standard.\\n\"}","env":{},"headers":{"Accept":"application/json, text/plain, */*","Content-Type":"application/json"},"maxBodyLength":-1,"maxContentLength":-1,"method":"post","timeout":0,"transformRequest":[null],"transformResponse":[null],"transitional":{"clarifyTimeoutError":false,"forcedJSONParsing":true,"silentJSONParsing":true},"url":"http://localhost:8000/parse","xsrfCookieName":"XSRF-TOKEN","xsrfHeaderName":"X-XSRF-TOKEN"},"message":"Network Error","name":"AxiosError","stack":"handleError@http://localhost:3000/_next/static/chunks/9e883_axios_lib_a21a55dc._.js:2515:201\n@http://localhost:3000/_next/static/chunks/9e883_axios_lib_a21a55dc._.js:3273:66"}
+[00:47:18.070] Browser LOG     formatCustomQuery input: ```json
+{
+  "categories": [
+    {
+      "category": "markings",
+      "type": "word message",
+      "problems": [
+        "non-standard"
+      ],
+      "speed": "",
+      "notes": ""
+    },
+    {
+      "category": "markings",
+      "type": "straight arrow",
+      "problems": [
+        "non-standard"
+      ],
+      "speed": "",
+      "notes": ""
+    },
+    {
+      "category": "markings",
+      "type": "continuous center line",
+      "problems": [
+        "wrong color"
+      ],
+      "speed": "",
+      "notes": ""
+    },
+    {
+      "category": "markings",
+      "type": "ladder hatching",
+      "problems": [
+        "wrong color"
+      ],
+      "speed": "",
+      "notes": ""
+    },
+    {
+      "category": "signs",
+      "type": "single chevron (normal)",
+      "problems": [
+        "faded"
+      ],
+      "speed": "",
+      "notes": ""
+    },
+    {
+      "category": "signs",
+      "type": "hospital",
+      "problems": [
+        "faded"
+      ],
+      "speed": "",
+      "notes": ""
+    },
+    {
+      "category": "signs",
+      "type": "compulsory turn left",
+      "problems": [
+        "wrongly placed"
+      ],
+      "speed": "",
+      "notes": ""
+    },
+    {
+      "category": "signs",
+      "type": "pedestrian crossing informatory",
+      "problems": [
+        "wrongly placed"
+      ],
+      "speed": "",
+      "notes": ""
+    },
+    {
+      "category": "speed calming",
+      "type": "speed hump",
+      "problems": [
+        "placement issue",
+        "non-standard"
+      ],
+      "speed": "",
+      "notes": ""
+    },
+    {
+      "category": "speed calming",
+      "type": "speed bump",
+      "problems": [
+        "non-standard"
+      ],
+      "speed": "",
+      "notes": ""
+    }
+  ],
+  "prompt": "A word message \"DISABLED\" marking is non-standard. A straight arrow marking is non-standard. A continuous center line marking has the wrong color. A ladder hatching marking has the wrong color. A single chevron (normal) sign is faded. A hospital sign is faded. A compulsory turn left sign is wrongly placed. Pedestrian crossing informatory signs are wrongly placed. A speed hump has a placement issue. A speed bump is non-standard. A speed hump is non-standard."
+}
+``` string
+[00:47:18.070] Browser LOG     formatCustomQuery output: **Category**: markings
+**Type**: word message
+**Problems**: non-standard
+**Category**: markings
+**Type**: straight arrow
+**Problems**: non-standard
+**Category**: markings
+**Type**: continuous center line
+**Problems**: wrong color
+**Category**: markings
+**Type**: ladder hatching
+**Problems**: wrong color
+**Category**: signs
+**Type**: single chevron (normal)
+**Problems**: faded
+**Category**: signs
+**Type**: hospital
+**Problems**: faded
+**Category**: signs
+**Type**: compulsory turn left
+**Problems**: wrongly placed
+**Category**: signs
+**Type**: pedestrian crossing informatory
+**Problems**: wrongly placed
+**Category**: speed calming
+**Type**: speed hump
+**Problems**: placement issue, non-standard
+**Category**: speed calming
+**Type**: speed bump
+**Problems**: non-standard
+**Final prompt**: A word message "DISABLED" marking is non-standard. A straight arrow marking is non-standard. A continuous center line marking has the wrong color. A ladder hatching marking has the wrong color. A single chevron (normal) sign is faded. A hospital sign is faded. A compulsory turn left sign is wrongly placed. Pedestrian crossing informatory signs are wrongly placed. A speed hump has a placement issue. A speed bump is non-standard. A speed hump is non-standard.
+[00:47:18.070] Browser LOG     Formatted prompt: **Category**: markings
+**Type**: word message
+**Problems**: non-standard
+**Category**: markings
+**Type**: straight arrow
+**Problems**: non-standard
+**Category**: markings
+**Type**: continuous center line
+**Problems**: wrong color
+**Category**: markings
+**Type**: ladder hatching
+**Problems**: wrong color
+**Category**: signs
+**Type**: single chevron (normal)
+**Problems**: faded
+**Category**: signs
+**Type**: hospital
+**Problems**: faded
+**Category**: signs
+**Type**: compulsory turn left
+**Problems**: wrongly placed
+**Category**: signs
+**Type**: pedestrian crossing informatory
+**Problems**: wrongly placed
+**Category**: speed calming
+**Type**: speed hump
+**Problems**: placement issue, non-standard
+**Category**: speed calming
+**Type**: speed bump
+**Problems**: non-standard
+**Final prompt**: A word message "DISABLED" marking is non-standard. A straight arrow marking is non-standard. A continuous center line marking has the wrong color. A ladder hatching marking has the wrong color. A single chevron (normal) sign is faded. A hospital sign is faded. A compulsory turn left sign is wrongly placed. Pedestrian crossing informatory signs are wrongly placed. A speed hump has a placement issue. A speed bump is non-standard. A speed hump is non-standard.
