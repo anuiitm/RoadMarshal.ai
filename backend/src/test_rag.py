@@ -13,7 +13,7 @@ A speed hump has a placement issue.
 A speed bump is non-standard.
 A speed hump is non-standard.
 """
-resp = rag_answer(query, top_k=20) # Temporarily increasing top_k in the call if possible, or I'll rely on default and see what happens. Actually rag_engine default is 10.
+resp = rag_answer(query, top_k=50)  # increased to retrieve many chunks
 
 print("\n=== FINAL ANSWER ===\n")
 print(resp["answer"])

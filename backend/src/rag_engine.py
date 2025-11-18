@@ -7,7 +7,7 @@ from .ai_client import call_gemini
 def get_vectorstore():
     return VectorStore()
 
-def rag_answer(query: str, top_k: int = 25):
+def rag_answer(query: str, top_k: int = 10):
     if not query or not query.strip():
         return {"error": "Empty query"}
 
