@@ -57,8 +57,8 @@ Follow these steps to set up and run the RoadMarshal AI project locally.
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
-cd RoadMarshal_AI
+git clone https://github.com/anuiitm/RoadMarshal.ai.git
+cd RoadMarshal.ai
 ```
 
 ### 2. Backend Setup
@@ -113,11 +113,3 @@ This will start the Next.js development server, typically accessible at `http://
 3.  Provide additional details like speed and notes if prompted.
 4.  Submit your query to receive AI-generated road safety intervention recommendations.
 5.  Use the "Download PDF" button to save the report.
-
-## Contributing
-
-(Optional section: Add guidelines for contributing to the project if applicable.)
-
-## License
-
-(Optional section: Add license information.)
