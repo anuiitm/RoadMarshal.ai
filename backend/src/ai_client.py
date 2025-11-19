@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 API_KEY = os.getenv("GEMINI_API_KEY")
-MODEL = os.getenv("GEMINI_MODEL", os.getenv("CHAT_MODEL", "gemini-2.0-flash"))
+MODEL = os.getenv("GEMINI_MODEL", os.getenv("CHAT_MODEL", "gemini-2.5-flash"))
 
 print(f"DEBUG: Using model: {MODEL}")
 
